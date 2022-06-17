@@ -111,7 +111,7 @@
 #endif
 
 #define BOOT_TARGET_DEVICES(func)	\
-	BOOT_TARGET_MMC0(func)
+	BOOT_TARGET_MMC1(func)
 
 /*
  * bootcmd for stm32mp1:
