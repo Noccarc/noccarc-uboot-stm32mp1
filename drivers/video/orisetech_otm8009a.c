@@ -65,15 +65,15 @@ struct otm8009a_panel_priv {
 };
 
 static const struct display_timing default_timing = {
-	.pixelclock.typ		= 29700000,
-	.hactive.typ		= 480,
-	.hfront_porch.typ	= 98,
-	.hback_porch.typ	= 98,
-	.hsync_len.typ		= 32,
-	.vactive.typ		= 800,
-	.vfront_porch.typ	= 15,
-	.vback_porch.typ	= 14,
-	.vsync_len.typ		= 10,
+	.pixelclock.typ		= 65000000,
+	.hactive.typ		= 1024,
+	.hfront_porch.typ	= 155,
+	.hback_porch.typ	= 155,
+	.hsync_len.typ		= 10,
+	.vactive.typ		= 768,
+	.vfront_porch.typ	= 16,
+	.vback_porch.typ	= 16,
+	.vsync_len.typ		= 6,
 };
 
 static void otm8009a_dcs_write_buf(struct udevice *dev, const void *data,
