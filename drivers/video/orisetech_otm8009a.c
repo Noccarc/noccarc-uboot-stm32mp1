@@ -326,8 +326,8 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 
 static int otm8009a_panel_probe(struct udevice *dev)
 {
-	log_info("orisetech: Inside probe function. Called by log info.");
-	log_debug("orisetech: Inside probe function. Called by log debug.");
+	log_info("orisetech: Inside probe function. Called by log info.\n");
+        log_info("orisetech: Inside probe function. Dev parent is %c \n", dev->name);
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	int ret;
