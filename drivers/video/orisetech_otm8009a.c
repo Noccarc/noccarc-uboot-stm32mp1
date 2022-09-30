@@ -8,7 +8,7 @@
  * drivers/gpu/drm/panel/panel-orisetech-otm8009a.c.
  */
 #define LOG_DEBUG
-#define DEBUG
+//#define DEBUG
 
 #include <common.h>
 #include <backlight.h>
