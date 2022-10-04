@@ -165,11 +165,13 @@ static int tianma_attach(struct udevice *dev)
 	int ret, i, len;
 	u8 val=0;
 	bool pll_en_flag = false;
+	u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
+	u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
 
 	device = plat->device;
 	
 	device->channel = 0;
-	device->name = "heavy driver";
+	device->name = "heavy_driver";
 	device->lanes = 2;
 	device->format = MIPI_DSI_FMT_RGB888;
 	device->mode_flags = MIPI_DSI_MODE_VIDEO_BURST;
@@ -215,14 +217,14 @@ static int tianma_attach(struct udevice *dev)
 	tianma_write(dev, REG_LVDS_CM, 0x00);       //1b
 	
 	
-	hback_porch      = default_timing->hback_porch.typ;
-	hsync_len        = default_timing->hsync_len.typ;
-	vback_porch      = default_timing->vback_porch.typ;
-	vsync_len        = default_timing->vsync_len.typ;
-	hfront_porch     = default_timing->hfront_porch.typ;	
-	hactive          = default_timing->hactive.typ;
-	vfront_porch     = default_timing->vfront_porch.typ;
-	vactive          = default_timing->vactive.typ;
+	hback_porch      = 155;  //default_timing->hback_porch.typ;
+	hsync_len        = 10;   //default_timing->hsync_len.typ;
+	vback_porch      = 16;   //default_timing->vback_porch.typ;
+	vsync_len        = 6;    //default_timing->vsync_len.typ;
+	hfront_porch     = 155;  //default_timing->hfront_porch.typ;	
+	hactive          = 1024; //default_timing->hactive.typ;
+	vfront_porch     = 16;   //default_timing->vfront_porch.typ;
+	vactive          = 768;  //default_timing->vactive.typ;
 
 	
 	tianma_write(dev, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20
@@ -260,7 +262,7 @@ static int tianma_attach(struct udevice *dev)
 	}
 	
 	if (pll_en_flag==false) {
-		log_info(ti->dev, "failed to lock PLL, ret=%i\n", pll_en_flag);
+		log_info("tianma: (attach) failed to lock PLL \n");
 		/* On failure, disable PLL again and exit. */
 		tianma_write(dev, REG_RC_PLL_EN, 0x00);
 		return;
