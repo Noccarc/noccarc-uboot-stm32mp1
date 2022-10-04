@@ -33,3 +33,13 @@ config VIDEO_BRIDGE_ANALOGIX_ANX6345
 	help
 	 The Analogix ANX6345 is RGB-to-DP converter. It enables an eDP LCD
 	 panel to be connected to an parallel LCD interface.
+	 
+config VIDEO_BRIDGE_TIANMA_NLB150XG01
+        bool "Support TIANMA NLB150XG01 DSI->LVDS bridge"
+        depends on VIDEO_BRIDGE
+        help
+          The Tianma nlb150xg01 is a DSI-to-LVDS (Low voltage
+          differential signalling) converters. They enable an LVDS LCD panel
+          to be connected to an DSI output device such as an SoC that lacks
+          LVDS capability, or where LVDS requires too many signals to route
+          on the PCB. Setup parameters are provided in the device tree.
