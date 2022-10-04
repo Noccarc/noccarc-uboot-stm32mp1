@@ -1,6 +1,7 @@
 /* Heavy driver */
 
 #define LOG_DEBUG
+#define LOG_CATEGORY LOGC_DM
 
 #include <common.h>
 #include <dm.h>
