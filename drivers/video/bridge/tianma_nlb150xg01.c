@@ -171,7 +171,7 @@ static int tianma_attach(struct udevice *dev)
 	device = plat->device;
 	
 	device->channel = 0;
-	device->name = "heavy_driver";
+	device->name = "heavyDriver";
 	device->lanes = 2;
 	device->format = MIPI_DSI_FMT_RGB888;
 	device->mode_flags = MIPI_DSI_MODE_VIDEO_BURST;
