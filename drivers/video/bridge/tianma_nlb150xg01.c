@@ -167,11 +167,12 @@ static int tianma_attach(struct udevice *dev)
 	bool pll_en_flag = false;
 	u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
 	u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
+	
 
 	device = plat->device;
 	
 	device->channel = 0;
-	device->name = "heavyDriver";
+	strcpy(device->name, "heavyDriver");
 	device->lanes = 2;
 	device->format = MIPI_DSI_FMT_RGB888;
 	device->mode_flags = MIPI_DSI_MODE_VIDEO_BURST;
@@ -265,7 +266,7 @@ static int tianma_attach(struct udevice *dev)
 		log_info("tianma: (attach) failed to lock PLL \n");
 		/* On failure, disable PLL again and exit. */
 		tianma_write(dev, REG_RC_PLL_EN, 0x00);
-		return;
+		return -EINVAL;
 	}
 	/* Trigger reset after CSR register update. */
 	tianma_write(dev, REG_RC_RESET, 0x01);
