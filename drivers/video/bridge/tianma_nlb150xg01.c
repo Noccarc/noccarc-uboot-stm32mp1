@@ -132,7 +132,7 @@ static int tianma_write(struct udevice *dev, uint8_t addr,
 	struct dm_i2c_chip *chip = dev_get_parent_platdata(dev);
 	int ret;
 
-	ret =  i2c_write(chip->chip_addr, addr, 1, value, 1);
+	ret =  dm_i2c_write(chip->chip_addr, addr, 1, value, 1);
 	if (ret) {
 		debug("%s: write failed, reg=%#x, value=%#x, ret=%d\n",
 		      addr, value, ret);
@@ -147,7 +147,7 @@ static int tianma_read(struct udevice *dev, uint8_t addr,
 	struct dm_i2c_chip *chip = dev_get_parent_platdata(dev);
 	int ret;
 	
-	ret =  i2c_read(chip->chip_addr, addr, 1, value, 1);
+	ret =  dm_i2c_read(chip->chip_addr, addr, 1, value, 1);
 	if (ret) {
 		debug("%s: read failed, reg=%#x, value=%#x, ret=%d\n",
 		      addr, value, ret);
