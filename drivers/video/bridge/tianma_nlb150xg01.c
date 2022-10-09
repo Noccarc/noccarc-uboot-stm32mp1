@@ -169,7 +169,7 @@ static int tianma_attach(struct udevice *dev)
 	u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
 	u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
 	
-
+	log_info("tianma: entered attach function.\n");
 	device = plat->device;
 	
 	device->channel = 0;
@@ -284,6 +284,8 @@ static int tianma_ofdata_to_platdata(struct udevice *dev)
 {
 	struct tianma_panel_priv *priv = dev_get_priv(dev);
 	int ret;
+	
+	log_info("tianma: entered ofdata to plat.\n");
 
 	if (IS_ENABLED(CONFIG_DM_REGULATOR)) {
 		ret =  device_get_supply_regulator(dev, "power-supply",
@@ -315,7 +317,7 @@ static int tianma_probe(struct udevice *dev)
 	struct tianma_panel_priv *priv = dev_get_priv(dev);
 	int ret;
 	
-	log_info("%s\n", __func__);
+	log_info("tianma: entered probing funtion.%s\n", __func__);
 	if (device_get_uclass_id(dev->parent) != UCLASS_I2C)
 	{
 		log_info("tianma: (probe) Uclass i2c not found.\n");
@@ -356,4 +358,4 @@ U_BOOT_DRIVER(tianma_nlb150xg01) = {
 	.ops	              = &tianma_ops,
 	.ofdata_to_platdata	  = tianma_ofdata_to_platdata,
 	.priv_auto_alloc_size	= sizeof(struct tianma_panel_priv),
-};			
+};
