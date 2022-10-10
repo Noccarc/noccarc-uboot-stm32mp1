@@ -145,6 +145,11 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	uchar ret;
 	struct udevice *dev1;
 	int ret1;
+	
+	u8 val=0,i=0;
+	bool pll_en_flag = false;
+	u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
+	u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
 
 	ret1 = i2c_get_chip_for_busnum(3, 0x2c,
 				      1, &dev1);
