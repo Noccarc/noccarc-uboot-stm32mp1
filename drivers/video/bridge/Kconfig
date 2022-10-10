@@ -37,6 +37,7 @@ config VIDEO_BRIDGE_ANALOGIX_ANX6345
 config VIDEO_BRIDGE_TIANMA_NLB150XG01
         bool "Support TIANMA NLB150XG01 DSI->LVDS bridge"
         depends on VIDEO_BRIDGE
+	select VIDEO_MIPI_DSI
         help
           The Tianma nlb150xg01 is a DSI-to-LVDS (Low voltage
           differential signalling) converters. They enable an LVDS LCD panel
