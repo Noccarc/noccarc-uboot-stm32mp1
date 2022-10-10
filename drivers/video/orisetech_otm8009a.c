@@ -62,9 +62,10 @@ static int otm8009a_init_sequence(struct udevice *dev)
 		return 0;
 	}
 	
+	ret = dm_i2c_reg_read(dev, 0xe5);
 	//ret = i2c_reg_read(0x2c, 0xe5);
 
-	//log_info("driver: %d", ret);
+	log_info("driver: %d \n", ret);
 	
 
 	return 0;
@@ -75,6 +76,8 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	struct mipi_dsi_device *device = plat->device;
 	int ret;
+	
+	log_info("driver: Entered enable backlight \n");
 
 	ret = mipi_dsi_attach(device);
 	if (ret < 0)
@@ -114,6 +117,7 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 				   GPIOD_IS_OUT_ACTIVE);
 	if (ret) {
 		dev_err(dev, "warning: cannot get enable GPIO\n");
+		log_info("driver: enable gpio not found\n");
 		if (ret != -ENOENT)
 			return ret;	
 	}
@@ -126,7 +130,9 @@ static int otm8009a_panel_probe(struct udevice *dev)
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	int ret;
-
+	
+	log_info("driver: Entered probe \n");
+	
 	if (IS_ENABLED(CONFIG_DM_REGULATOR) && priv->reg) {
 		dev_dbg(dev, "enable regulator '%s'\n", priv->reg->name);
 		ret = regulator_set_enable(priv->reg, true);
