@@ -2,6 +2,8 @@
 /*
  * Copyright (C) 2018, STMicroelectronics - All Rights Reserved
  */
+#define LOG_DEBUG
+#define LOG_CATEGORY LOGC_DM
 
 #include <common.h>
 #include <dm.h>
@@ -42,6 +44,7 @@ static const struct pmic_child_info stpmic1_children_info[] = {
 
 static int stpmic1_reg_count(struct udevice *dev)
 {
+	log_info("stpmic: entered reg_count function.\n");
 	return STPMIC1_NUM_OF_REGS;
 }
 
@@ -72,6 +75,7 @@ static int stpmic1_read(struct udevice *dev, uint reg, uint8_t *buff, int len)
 
 static int stpmic1_bind(struct udevice *dev)
 {
+	log_info("stpmic: entered bind function.\n");
 	int ret;
 #if CONFIG_IS_ENABLED(DM_REGULATOR)
 	ofnode regulators_node;
