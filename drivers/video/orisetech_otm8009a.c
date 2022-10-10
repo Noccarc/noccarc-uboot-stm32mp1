@@ -20,6 +20,7 @@
 #include <linux/delay.h>
 #include <power/regulator.h>
 #include <i2c.h>
+#include <command.h>
 
 #define OTM8009A_BACKLIGHT_DEFAULT	100
 #define OTM8009A_BACKLIGHT_MAX		255
@@ -50,10 +51,20 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	struct mipi_dsi_device *device = plat->device;
 	uchar ret;
-	
-	ret = i2c_reg_read(0x2c, 0xe5);
+	struct udevice *dev1;
+	int ret1;
 
-	log_info("driver: %d", ret);
+	ret1 = i2c_get_chip_for_busnum(3, 0x2c,
+				      1, &dev1);
+	if (ret1) {
+		log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
+		       3);
+		return 0;
+	}
+	
+	//ret = i2c_reg_read(0x2c, 0xe5);
+
+	//log_info("driver: %d", ret);
 	
 
 	return 0;
