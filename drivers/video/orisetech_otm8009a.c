@@ -7,6 +7,9 @@
  * This otm8009a panel driver is inspired from the Linux Kernel driver
  * drivers/gpu/drm/panel/panel-orisetech-otm8009a.c.
  */
+#define LOG_DEBUG
+#define LOG_CATEGORY LOGC_DM
+
 #include <common.h>
 #include <backlight.h>
 #include <dm.h>
@@ -16,239 +19,289 @@
 #include <dm/device_compat.h>
 #include <linux/delay.h>
 #include <power/regulator.h>
+#include <i2c.h>
+#include <command.h>
 
-#define OTM8009A_BACKLIGHT_DEFAULT	240
+#define OTM8009A_BACKLIGHT_DEFAULT	100
 #define OTM8009A_BACKLIGHT_MAX		255
 
+
+/* ID registers */
+#define REG_ID(n)				                (0x00 + (n))
+/* Reset and clock registers */
+#define REG_RC_RESET				            0x09
+#define  REG_RC_RESET_SOFT_RESET		        0x01
+#define REG_RC_LVDS_PLL				            0x0a
+#define  REG_RC_LVDS_PLL_PLL_EN_STAT		    0x80
+#define  REG_RC_LVDS_PLL_LVDS_CLK_RANGE(n)	    (((n) & 0x7) << 1)
+#define  REG_RC_LVDS_PLL_HS_CLK_SRC_DPHY	    0x01
+#define REG_RC_DSI_CLK				            0x0b
+#define  REG_RC_DSI_CLK_DSI_CLK_DIVIDER(n)	    (((n) & 0x1f) << 3)
+#define  REG_RC_DSI_CLK_REFCLK_MULTIPLIER(n)	((n) & 0x3)
+#define REG_RC_PLL_EN				            0x0d
+#define  REG_RC_PLL_EN_PLL_EN			        0x01
+/* DSI registers */
+#define REG_DSI_LANE				            0x10
+#define  REG_DSI_LANE_LEFT_RIGHT_PIXELS		    0x80	      /* DSI85-only */
+#define  REG_DSI_LANE_DSI_CHANNEL_MODE_DUAL	    0	          /* DSI85-only */
+#define  REG_DSI_LANE_DSI_CHANNEL_MODE_2SINGLE	0x40	      /* DSI85-only */
+#define  REG_DSI_LANE_DSI_CHANNEL_MODE_SINGLE	0x20
+#define  REG_DSI_LANE_CHA_DSI_LANES(n)		    (((n) & 0x3) << 3)
+#define  REG_DSI_LANE_CHB_DSI_LANES(n)		    (((n) & 0x3) << 1)
+#define  REG_DSI_LANE_SOT_ERR_TOL_DIS		    0x01
+#define REG_DSI_EQ				                0x11
+#define  REG_DSI_EQ_CHA_DSI_DATA_EQ(n)		    (((n) & 0x3) << 6)
+#define  REG_DSI_EQ_CHA_DSI_CLK_EQ(n)		    (((n) & 0x3) << 2)
+#define REG_DSI_CLK				                0x12
+#define  REG_DSI_CLK_CHA_DSI_CLK_RANGE(n)	    ((n) & 0xff)
+/* LVDS registers */
+#define REG_LVDS_FMT				            0x18
+#define  REG_LVDS_FMT_DE_NEG_POLARITY		    0x80
+#define  REG_LVDS_FMT_HS_NEG_POLARITY		    0x40
+#define  REG_LVDS_FMT_VS_NEG_POLARITY		    0x20
+#define  REG_LVDS_FMT_LVDS_LINK_CFG		        0x10	      /* 0:AB 1:A-only */
+#define  REG_LVDS_FMT_CHA_24BPP_MODE		    0x08
+#define  REG_LVDS_FMT_CHB_24BPP_MODE		    0x04
+#define  REG_LVDS_FMT_CHA_24BPP_FORMAT1		    0x02
+#define  REG_LVDS_FMT_CHB_24BPP_FORMAT1		    0x01
+#define REG_LVDS_VCOM				            0x19
+#define  REG_LVDS_VCOM_CHA_LVDS_VOCM		    0x40
+#define  REG_LVDS_VCOM_CHB_LVDS_VOCM		    0x10
+#define  REG_LVDS_VCOM_CHA_LVDS_VOD_SWING(n)	(((n) & 0x3) << 2)
+#define  REG_LVDS_VCOM_CHB_LVDS_VOD_SWING(n)	((n) & 0x3)
+#define REG_LVDS_LANE				            0x1a
+#define  REG_LVDS_LANE_EVEN_ODD_SWAP		    0x40
+#define  REG_LVDS_LANE_CHA_REVERSE_LVDS		    0x20
+#define  REG_LVDS_LANE_CHB_REVERSE_LVDS		    0x10
+#define  REG_LVDS_LANE_CHA_LVDS_TERM		    0x02
+#define  REG_LVDS_LANE_CHB_LVDS_TERM		    0x01
+#define REG_LVDS_CM				                0x1b
+#define  REG_LVDS_CM_CHA_LVDS_CM_ADJUST(n)	    (((n) & 0x3) << 4)
+#define  REG_LVDS_CM_CHB_LVDS_CM_ADJUST(n)	    ((n) & 0x3)
+/* Video registers */
+#define REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW	    0x20
+#define REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH	    0x21
+#define REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW	0x24
+#define REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH	0x25
+#define REG_VID_CHA_SYNC_DELAY_LOW		        0x28
+#define REG_VID_CHA_SYNC_DELAY_HIGH		        0x29
+#define REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW	    0x2c
+#define REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH	    0x2d
+#define REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW	    0x30
+#define REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH	    0x31
+#define REG_VID_CHA_HORIZONTAL_BACK_PORCH	    0x34
+#define REG_VID_CHA_VERTICAL_BACK_PORCH		    0x36
+#define REG_VID_CHA_HORIZONTAL_FRONT_PORCH	    0x38
+#define REG_VID_CHA_VERTICAL_FRONT_PORCH	    0x3a
+#define REG_VID_CHA_TEST_PATTERN		        0x3c
+/* IRQ registers */
+#define REG_IRQ_GLOBAL				            0xe0
+#define  REG_IRQ_GLOBAL_IRQ_EN			        0x01
+#define REG_IRQ_EN				                0xe1
+#define  REG_IRQ_EN_CHA_SYNCH_ERR_EN		    0x80
+#define  REG_IRQ_EN_CHA_CRC_ERR_EN		        0x40
+#define  REG_IRQ_EN_CHA_UNC_ECC_ERR_EN		    0x20
+#define  REG_IRQ_EN_CHA_COR_ECC_ERR_EN		    0x10
+#define  REG_IRQ_EN_CHA_LLP_ERR_EN		        0x08
+#define  REG_IRQ_EN_CHA_SOT_BIT_ERR_EN		    0x04
+#define  REG_IRQ_EN_CHA_PLL_UNLOCK_EN		    0x01
+#define REG_IRQ_STAT				            0xe5
+#define  REG_IRQ_STAT_CHA_SYNCH_ERR		        0x80
+#define  REG_IRQ_STAT_CHA_CRC_ERR		        0x40
+#define  REG_IRQ_STAT_CHA_UNC_ECC_ERR		    0x20
+#define  REG_IRQ_STAT_CHA_COR_ECC_ERR		    0x10
+#define  REG_IRQ_STAT_CHA_LLP_ERR		        0x08
+#define  REG_IRQ_STAT_CHA_SOT_BIT_ERR		    0x04
+#define  REG_IRQ_STAT_CHA_PLL_UNLOCK		    0x01
+
+#define SINGLE_LINK		                        1		
+#define DUAL_LINK		                        2
+
 /* Manufacturer Command Set */
-#define MCS_ADRSFT	0x0000	/* Address Shift Function */
-#define MCS_PANSET	0xB3A6	/* Panel Type Setting */
-#define MCS_SD_CTRL	0xC0A2	/* Source Driver Timing Setting */
-#define MCS_P_DRV_M	0xC0B4	/* Panel Driving Mode */
-#define MCS_OSC_ADJ	0xC181	/* Oscillator Adjustment for Idle/Normal mode */
-#define MCS_RGB_VID_SET	0xC1A1	/* RGB Video Mode Setting */
-#define MCS_SD_PCH_CTRL	0xC480	/* Source Driver Precharge Control */
-#define MCS_NO_DOC1	0xC48A	/* Command not documented */
-#define MCS_PWR_CTRL1	0xC580	/* Power Control Setting 1 */
-#define MCS_PWR_CTRL2	0xC590	/* Power Control Setting 2 for Normal Mode */
-#define MCS_PWR_CTRL4	0xC5B0	/* Power Control Setting 4 for DC Voltage */
-#define MCS_PANCTRLSET1	0xCB80	/* Panel Control Setting 1 */
-#define MCS_PANCTRLSET2	0xCB90	/* Panel Control Setting 2 */
-#define MCS_PANCTRLSET3	0xCBA0	/* Panel Control Setting 3 */
-#define MCS_PANCTRLSET4	0xCBB0	/* Panel Control Setting 4 */
-#define MCS_PANCTRLSET5	0xCBC0	/* Panel Control Setting 5 */
-#define MCS_PANCTRLSET6	0xCBD0	/* Panel Control Setting 6 */
-#define MCS_PANCTRLSET7	0xCBE0	/* Panel Control Setting 7 */
-#define MCS_PANCTRLSET8	0xCBF0	/* Panel Control Setting 8 */
-#define MCS_PANU2D1	0xCC80	/* Panel U2D Setting 1 */
-#define MCS_PANU2D2	0xCC90	/* Panel U2D Setting 2 */
-#define MCS_PANU2D3	0xCCA0	/* Panel U2D Setting 3 */
-#define MCS_PAND2U1	0xCCB0	/* Panel D2U Setting 1 */
-#define MCS_PAND2U2	0xCCC0	/* Panel D2U Setting 2 */
-#define MCS_PAND2U3	0xCCD0	/* Panel D2U Setting 3 */
-#define MCS_GOAVST	0xCE80	/* GOA VST Setting */
-#define MCS_GOACLKA1	0xCEA0	/* GOA CLKA1 Setting */
-#define MCS_GOACLKA3	0xCEB0	/* GOA CLKA3 Setting */
-#define MCS_GOAECLK	0xCFC0	/* GOA ECLK Setting */
-#define MCS_NO_DOC2	0xCFD0	/* Command not documented */
-#define MCS_GVDDSET	0xD800	/* GVDD/NGVDD */
-#define MCS_VCOMDC	0xD900	/* VCOM Voltage Setting */
-#define MCS_GMCT2_2P	0xE100	/* Gamma Correction 2.2+ Setting */
-#define MCS_GMCT2_2N	0xE200	/* Gamma Correction 2.2- Setting */
-#define MCS_NO_DOC3	0xF5B6	/* Command not documented */
-#define MCS_CMD2_ENA1	0xFF00	/* Enable Access Command2 "CMD2" */
-#define MCS_CMD2_ENA2	0xFF80	/* Enable Access Orise Command2 */
+
 
 struct otm8009a_panel_priv {
 	struct udevice *reg;
-	struct gpio_desc reset;
+	struct gpio_desc enable;
 };
 
 static const struct display_timing default_timing = {
-	.pixelclock.typ		= 29700000,
-	.hactive.typ		= 480,
-	.hfront_porch.typ	= 98,
-	.hback_porch.typ	= 98,
-	.hsync_len.typ		= 32,
-	.vactive.typ		= 800,
-	.vfront_porch.typ	= 15,
-	.vback_porch.typ	= 14,
-	.vsync_len.typ		= 10,
+	.pixelclock.typ		= 65000000,
+	.hactive.typ		= 1024,
+	.hfront_porch.typ	= 155,
+	.hback_porch.typ	= 155,
+	.hsync_len.typ		= 10,
+	.vactive.typ		= 768,
+	.vfront_porch.typ	= 16,
+	.vback_porch.typ	= 16,
+	.vsync_len.typ		= 6,
 };
 
-static void otm8009a_dcs_write_buf(struct udevice *dev, const void *data,
-				   size_t len)
-{
-	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
-	struct mipi_dsi_device *device = plat->device;
-
-	if (mipi_dsi_dcs_write_buffer(device, data, len) < 0)
-		dev_err(dev, "mipi dsi dcs write buffer failed\n");
-}
-
-static void otm8009a_dcs_write_buf_hs(struct udevice *dev, const void *data,
-				      size_t len)
-{
-	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
-	struct mipi_dsi_device *device = plat->device;
-
-	/* data will be sent in dsi hs mode (ie. no lpm) */
-	device->mode_flags &= ~MIPI_DSI_MODE_LPM;
-
-	if (mipi_dsi_dcs_write_buffer(device, data, len) < 0)
-		dev_err(dev, "mipi dsi dcs write buffer failed\n");
-
-	/* restore back the dsi lpm mode */
-	device->mode_flags |= MIPI_DSI_MODE_LPM;
-}
-
-#define dcs_write_seq(dev, seq...)				\
-({								\
-	static const u8 d[] = { seq };				\
-	otm8009a_dcs_write_buf(dev, d, ARRAY_SIZE(d));		\
-})
-
-#define dcs_write_seq_hs(dev, seq...)				\
-({								\
-	static const u8 d[] = { seq };				\
-	otm8009a_dcs_write_buf_hs(dev, d, ARRAY_SIZE(d));	\
-})
-
-#define dcs_write_cmd_at(dev, cmd, seq...)		\
-({							\
-	static const u16 c = cmd;			\
-	struct udevice *device = dev;			\
-	dcs_write_seq(device, MCS_ADRSFT, (c) & 0xFF);	\
-	dcs_write_seq(device, (c) >> 8, seq);		\
-})
 
 static int otm8009a_init_sequence(struct udevice *dev)
 {
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	struct mipi_dsi_device *device = plat->device;
-	int ret;
+	uchar ret;
+	struct udevice *dev1;
+	int ret1;
+	
+	u8 val=0,i=0,k=0;
+	bool pll_en_flag = false;
+	u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
+	u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
 
-	/* Enter CMD2 */
-	dcs_write_cmd_at(dev, MCS_CMD2_ENA1, 0x80, 0x09, 0x01);
+	ret1 = i2c_get_chip_for_busnum(3, 0x2c,
+				      1, &dev1);
+	if (ret1) {
+		log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
+		       3);
+		return ret1;
+	}
+	
+	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);   //0d
+	k = dm_i2c_reg_read(dev1, REG_RC_PLL_EN);
+	log_info("driver: %d -> %d \n",k, REG_RC_PLL_EN);
+	
+	mdelay(1);
+	
+	/* Reference clock derived from DSI link clock. */
+	dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);  //0a
+	k = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
+	log_info("driver: %d -> %d \n",k, REG_RC_LVDS_PLL);
+	
+	dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x48);      //12
+	k = dm_i2c_reg_read(dev1, REG_DSI_CLK);
+	log_info("driver: %d -> %d \n",k, REG_DSI_CLK);
+	
+	dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x28);   //0b
+	k = dm_i2c_reg_read(dev1, REG_RC_DSI_CLK);
+	log_info("driver: %d -> %d \n",k, REG_RC_DSI_CLK);
+	
+	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);    //0d
+	k = dm_i2c_reg_read(dev1, REG_RC_PLL_EN);
+	log_info("driver: %d -> %d \n",k, REG_RC_PLL_EN);
+	
+	/* Set number of DSI lanes and LVDS link config. */
+	dm_i2c_reg_write(dev1, REG_DSI_LANE, 0x30);     //10
+	k = dm_i2c_reg_read(dev1, REG_DSI_LANE);
+	log_info("driver: %d -> %d \n",k, REG_DSI_LANE);
+	
+	/* No equalization. */
+	dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);       //11
+	k = dm_i2c_reg_read(dev1, REG_DSI_EQ);
+	log_info("driver: %d -> %d \n",k, REG_DSI_EQ);
 
-	/* Enter Orise Command2 */
-	dcs_write_cmd_at(dev, MCS_CMD2_ENA2, 0x80, 0x09);
+	
+	dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
+	k = dm_i2c_reg_read(dev1, REG_LVDS_FMT);
+	log_info("driver: %d -> %d \n",k, REG_LVDS_FMT);
+	
+	dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
+	k = dm_i2c_reg_read(dev1, REG_LVDS_VCOM);
+	log_info("driver: %d -> %d \n",k, REG_LVDS_VCOM);
+	
+	dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a
+	k = dm_i2c_reg_read(dev1, REG_LVDS_LANE);
+	log_info("driver: %d -> %d \n",k, REG_LVDS_LANE);
+	
+	dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
+	k = dm_i2c_reg_read(dev1, REG_LVDS_CM);
+	log_info("driver: %d -> %d \n",k, REG_LVDS_CM);
+	
+	
+	hback_porch      = 155;  //default_timing->hback_porch.typ;
+	hsync_len        = 10;   //default_timing->hsync_len.typ;
+	vback_porch      = 16;   //default_timing->vback_porch.typ;
+	vsync_len        = 6;    //default_timing->vsync_len.typ;
+	hfront_porch     = 155;  //default_timing->hfront_porch.typ;	
+	hactive          = 1024; //default_timing->hactive.typ;
+	vfront_porch     = 16;   //default_timing->vfront_porch.typ;
+	vactive          = 768;  //default_timing->vactive.typ;
 
-	dcs_write_cmd_at(dev, MCS_SD_PCH_CTRL, 0x30);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive>>8)&0xff));      //21
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, (u8)(vactive&0xff));         //24
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, (u8)((vactive>>8)&0xff));   //25
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH);
+	
+	/* 32 + 1 pixel clock to ensure proper operation */
+	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_LOW, 0xff);               //28
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_SYNC_DELAY_LOW);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_SYNC_DELAY_LOW);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_HIGH, 0x00);              //29
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_SYNC_DELAY_HIGH);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_SYNC_DELAY_HIGH);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, (u8)(hsync_len&0xff));             //2c
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, (u8)((hsync_len>>8)&0xff));       //2d
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, (u8)(vsync_len&0xff));             //30
+	k = dm_i2c_reg_read(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW);
+	log_info("driver: %d -> %d \n",k, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW);
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, (u8)((vsync_len>>8)&0xff));       //31
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_BACK_PORCH, (u8)(hback_porch&0xff));           //34
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_BACK_PORCH, (u8)(vback_porch&0xff));             //36
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_FRONT_PORCH, (u8)(hfront_porch&0xff));         //38
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_FRONT_PORCH, (u8)(vfront_porch&0xff));           //3a
+	dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);                 //3c
+	
+	/* Enable PLL */
+	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
+	k = dm_i2c_reg_read(dev1, REG_RC_PLL_EN);
+	log_info("driver: %d -> %d \n",k, REG_RC_PLL_EN);
+	
+	for(i=0; i<10; i++)
+	{
+		mdelay(1);
+		val=0;
+		val = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
+		if(val & 0x80 == 0x80)
+		{
+			pll_en_flag = true;
+			break;
+		}
+	}
+	
+	if (pll_en_flag==false) {
+		log_info("tianma: (attach) failed to lock PLL \n");
+		/* On failure, disable PLL again and exit. */
+		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
+		return -EINVAL;
+	}
+	/* Trigger reset after CSR register update. */
+	dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
+	k = dm_i2c_reg_read(dev1, REG_RC_RESET);
+	log_info("driver: %d -> %d \n",k, REG_RC_RESET);
 	mdelay(10);
+	
+	/* Clear all errors that got asserted during initialization. */
+	val=0;
+	val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
+	dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+	
 
-	dcs_write_cmd_at(dev, MCS_NO_DOC1, 0x40);
-	mdelay(10);
 
-	dcs_write_cmd_at(dev, MCS_PWR_CTRL4 + 1, 0xA9);
-	dcs_write_cmd_at(dev, MCS_PWR_CTRL2 + 1, 0x34);
-	dcs_write_cmd_at(dev, MCS_P_DRV_M, 0x50);
-	dcs_write_cmd_at(dev, MCS_VCOMDC, 0x4E);
-	dcs_write_cmd_at(dev, MCS_OSC_ADJ, 0x66); /* 65Hz */
-	dcs_write_cmd_at(dev, MCS_PWR_CTRL2 + 2, 0x01);
-	dcs_write_cmd_at(dev, MCS_PWR_CTRL2 + 5, 0x34);
-	dcs_write_cmd_at(dev, MCS_PWR_CTRL2 + 4, 0x33);
-	dcs_write_cmd_at(dev, MCS_GVDDSET, 0x79, 0x79);
-	dcs_write_cmd_at(dev, MCS_SD_CTRL + 1, 0x1B);
-	dcs_write_cmd_at(dev, MCS_PWR_CTRL1 + 2, 0x83);
-	dcs_write_cmd_at(dev, MCS_SD_PCH_CTRL + 1, 0x83);
-	dcs_write_cmd_at(dev, MCS_RGB_VID_SET, 0x0E);
-	dcs_write_cmd_at(dev, MCS_PANSET, 0x00, 0x01);
-
-	dcs_write_cmd_at(dev, MCS_GOAVST, 0x85, 0x01, 0x00, 0x84, 0x01, 0x00);
-	dcs_write_cmd_at(dev, MCS_GOACLKA1, 0x18, 0x04, 0x03, 0x39, 0x00, 0x00,
-			 0x00, 0x18, 0x03, 0x03, 0x3A, 0x00, 0x00, 0x00);
-	dcs_write_cmd_at(dev, MCS_GOACLKA3, 0x18, 0x02, 0x03, 0x3B, 0x00, 0x00,
-			 0x00, 0x18, 0x01, 0x03, 0x3C, 0x00, 0x00, 0x00);
-	dcs_write_cmd_at(dev, MCS_GOAECLK, 0x01, 0x01, 0x20, 0x20, 0x00, 0x00,
-			 0x01, 0x02, 0x00, 0x00);
-
-	dcs_write_cmd_at(dev, MCS_NO_DOC2, 0x00);
-
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			 0, 0, 0, 0, 0);
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			 0, 0, 0, 0, 0);
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET5, 0, 4, 4, 4, 4, 4, 0, 0, 0, 0,
-			 0, 0, 0, 0, 0);
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET6, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4,
-			 4, 0, 0, 0, 0);
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	dcs_write_cmd_at(dev, MCS_PANCTRLSET8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-			 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
-
-	dcs_write_cmd_at(dev, MCS_PANU2D1, 0x00, 0x26, 0x09, 0x0B, 0x01, 0x25,
-			 0x00, 0x00, 0x00, 0x00);
-	dcs_write_cmd_at(dev, MCS_PANU2D2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			 0x00, 0x00, 0x00, 0x00, 0x00, 0x26, 0x0A, 0x0C, 0x02);
-	dcs_write_cmd_at(dev, MCS_PANU2D3, 0x25, 0x00, 0x00, 0x00, 0x00, 0x00,
-			 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-	dcs_write_cmd_at(dev, MCS_PAND2U1, 0x00, 0x25, 0x0C, 0x0A, 0x02, 0x26,
-			 0x00, 0x00, 0x00, 0x00);
-	dcs_write_cmd_at(dev, MCS_PAND2U2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			 0x00, 0x00, 0x00, 0x00, 0x00, 0x25, 0x0B, 0x09, 0x01);
-	dcs_write_cmd_at(dev, MCS_PAND2U3, 0x26, 0x00, 0x00, 0x00, 0x00, 0x00,
-			 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-
-	dcs_write_cmd_at(dev, MCS_PWR_CTRL1 + 1, 0x66);
-
-	dcs_write_cmd_at(dev, MCS_NO_DOC3, 0x06);
-
-	dcs_write_cmd_at(dev, MCS_GMCT2_2P, 0x00, 0x09, 0x0F, 0x0E, 0x07, 0x10,
-			 0x0B, 0x0A, 0x04, 0x07, 0x0B, 0x08, 0x0F, 0x10, 0x0A,
-			 0x01);
-	dcs_write_cmd_at(dev, MCS_GMCT2_2N, 0x00, 0x09, 0x0F, 0x0E, 0x07, 0x10,
-			 0x0B, 0x0A, 0x04, 0x07, 0x0B, 0x08, 0x0F, 0x10, 0x0A,
-			 0x01);
-
-	/* Exit CMD2 */
-	dcs_write_cmd_at(dev, MCS_CMD2_ENA1, 0xFF, 0xFF, 0xFF);
-
-	ret =  mipi_dsi_dcs_nop(device);
-	if (ret)
-		return ret;
-
-	ret = mipi_dsi_dcs_exit_sleep_mode(device);
-	if (ret)
-		return ret;
-
-	/* Wait for sleep out exit */
-	mdelay(120);
-
-	/* Default portrait 480x800 rgb24 */
-	dcs_write_seq(dev, MIPI_DCS_SET_ADDRESS_MODE, 0x00);
-
-	ret =  mipi_dsi_dcs_set_column_address(device, 0,
-					       default_timing.hactive.typ - 1);
-	if (ret)
-		return ret;
-
-	ret =  mipi_dsi_dcs_set_page_address(device, 0,
-					     default_timing.vactive.typ - 1);
-	if (ret)
-		return ret;
-
-	/* See otm8009a driver documentation for pixel format descriptions */
-	ret =  mipi_dsi_dcs_set_pixel_format(device, MIPI_DCS_PIXEL_FMT_24BIT |
-					     MIPI_DCS_PIXEL_FMT_24BIT << 4);
-	if (ret)
-		return ret;
-
-	/* Disable CABC feature */
-	dcs_write_seq(dev, MIPI_DCS_WRITE_POWER_SAVE, 0x00);
-
-	ret = mipi_dsi_dcs_set_display_on(device);
-	if (ret)
-		return ret;
-
-	ret = mipi_dsi_dcs_nop(device);
-	if (ret)
-		return ret;
-
-	/* Send Command GRAM memory write (no parameters) */
-	dcs_write_seq(dev, MIPI_DCS_WRITE_MEMORY_START);
+	log_info("driver: %d \n", val);
+	
 
 	return 0;
 }
@@ -258,6 +311,8 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	struct mipi_dsi_device *device = plat->device;
 	int ret;
+	
+	log_info("driver: Entered enable backlight \n");
 
 	ret = mipi_dsi_attach(device);
 	if (ret < 0)
@@ -266,23 +321,7 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	ret = otm8009a_init_sequence(dev);
 	if (ret)
 		return ret;
-
-	/*
-	 * Power on the backlight with the requested brightness
-	 * Note We can not use mipi_dsi_dcs_set_display_brightness()
-	 * as otm8009a driver support only 8-bit brightness (1 param).
-	 */
-	dcs_write_seq(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
-		      OTM8009A_BACKLIGHT_DEFAULT);
-
-	/* Update Brightness Control & Backlight */
-	dcs_write_seq(dev, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x24);
-
-	/* Update Brightness Control & Backlight */
-	dcs_write_seq_hs(dev, MIPI_DCS_WRITE_CONTROL_DISPLAY);
-
-	/* Need to wait a few time before sending the first image */
-	mdelay(10);
+	
 
 	return 0;
 }
@@ -300,6 +339,8 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	int ret;
 
+    log_info("driver: Entered of to plat \n");
+	
 	if (IS_ENABLED(CONFIG_DM_REGULATOR)) {
 		ret =  device_get_supply_regulator(dev, "power-supply",
 						   &priv->reg);
@@ -309,12 +350,13 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 		}
 	}
 
-	ret = gpio_request_by_name(dev, "reset-gpios", 0, &priv->reset,
-				   GPIOD_IS_OUT);
+	ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
+				   GPIOD_IS_OUT_ACTIVE);
 	if (ret) {
-		dev_err(dev, "warning: cannot get reset GPIO\n");
+		dev_err(dev, "warning: cannot get enable GPIO\n");
+		log_info("driver: enable gpio not found\n");
 		if (ret != -ENOENT)
-			return ret;
+			return ret;	
 	}
 
 	return 0;
@@ -325,26 +367,26 @@ static int otm8009a_panel_probe(struct udevice *dev)
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	int ret;
-
+	
+	log_info("driver: Entered probe \n");
+	
 	if (IS_ENABLED(CONFIG_DM_REGULATOR) && priv->reg) {
 		dev_dbg(dev, "enable regulator '%s'\n", priv->reg->name);
 		ret = regulator_set_enable(priv->reg, true);
 		if (ret)
 			return ret;
-	}
+	}	
 
-	/* reset panel */
-	dm_gpio_set_value(&priv->reset, true);
-	mdelay(1); /* >50us */
-	dm_gpio_set_value(&priv->reset, false);
+	/* enable panel */
+	dm_gpio_set_value(&priv->enable, false);
+	mdelay(10); /* >50us */
+	dm_gpio_set_value(&priv->enable, true);
 	mdelay(10); /* >5ms */
 
 	/* fill characteristics of DSI data link */
 	plat->lanes = 2;
 	plat->format = MIPI_DSI_FMT_RGB888;
-	plat->mode_flags = MIPI_DSI_MODE_VIDEO |
-			   MIPI_DSI_MODE_VIDEO_BURST |
-			   MIPI_DSI_MODE_LPM;
+	plat->mode_flags = MIPI_DSI_MODE_VIDEO_BURST ;
 
 	return 0;
 }
