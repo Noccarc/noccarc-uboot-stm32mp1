@@ -126,7 +126,7 @@ struct otm8009a_panel_priv {
 };
 
 static const struct display_timing default_timing = {
-	.pixelclock.typ		= 66000000,
+	.pixelclock.typ		= 65000000,
 	.hactive.typ		= 1024,
 	.hfront_porch.typ	= 155,
 	.hback_porch.typ	= 155,
@@ -242,7 +242,7 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	
 
 
-	log_info("driver: %d \n", ret);
+	log_info("driver: %d \n", val);
 	
 
 	return 0;
