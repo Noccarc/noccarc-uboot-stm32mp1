@@ -25,6 +25,98 @@
 #define OTM8009A_BACKLIGHT_DEFAULT	100
 #define OTM8009A_BACKLIGHT_MAX		255
 
+
+/* ID registers */
+#define REG_ID(n)				                (0x00 + (n))
+/* Reset and clock registers */
+#define REG_RC_RESET				            0x09
+#define  REG_RC_RESET_SOFT_RESET		        0x01
+#define REG_RC_LVDS_PLL				            0x0a
+#define  REG_RC_LVDS_PLL_PLL_EN_STAT		    0x80
+#define  REG_RC_LVDS_PLL_LVDS_CLK_RANGE(n)	    (((n) & 0x7) << 1)
+#define  REG_RC_LVDS_PLL_HS_CLK_SRC_DPHY	    0x01
+#define REG_RC_DSI_CLK				            0x0b
+#define  REG_RC_DSI_CLK_DSI_CLK_DIVIDER(n)	    (((n) & 0x1f) << 3)
+#define  REG_RC_DSI_CLK_REFCLK_MULTIPLIER(n)	((n) & 0x3)
+#define REG_RC_PLL_EN				            0x0d
+#define  REG_RC_PLL_EN_PLL_EN			        0x01
+/* DSI registers */
+#define REG_DSI_LANE				            0x10
+#define  REG_DSI_LANE_LEFT_RIGHT_PIXELS		    0x80	      /* DSI85-only */
+#define  REG_DSI_LANE_DSI_CHANNEL_MODE_DUAL	    0	          /* DSI85-only */
+#define  REG_DSI_LANE_DSI_CHANNEL_MODE_2SINGLE	0x40	      /* DSI85-only */
+#define  REG_DSI_LANE_DSI_CHANNEL_MODE_SINGLE	0x20
+#define  REG_DSI_LANE_CHA_DSI_LANES(n)		    (((n) & 0x3) << 3)
+#define  REG_DSI_LANE_CHB_DSI_LANES(n)		    (((n) & 0x3) << 1)
+#define  REG_DSI_LANE_SOT_ERR_TOL_DIS		    0x01
+#define REG_DSI_EQ				                0x11
+#define  REG_DSI_EQ_CHA_DSI_DATA_EQ(n)		    (((n) & 0x3) << 6)
+#define  REG_DSI_EQ_CHA_DSI_CLK_EQ(n)		    (((n) & 0x3) << 2)
+#define REG_DSI_CLK				                0x12
+#define  REG_DSI_CLK_CHA_DSI_CLK_RANGE(n)	    ((n) & 0xff)
+/* LVDS registers */
+#define REG_LVDS_FMT				            0x18
+#define  REG_LVDS_FMT_DE_NEG_POLARITY		    0x80
+#define  REG_LVDS_FMT_HS_NEG_POLARITY		    0x40
+#define  REG_LVDS_FMT_VS_NEG_POLARITY		    0x20
+#define  REG_LVDS_FMT_LVDS_LINK_CFG		        0x10	      /* 0:AB 1:A-only */
+#define  REG_LVDS_FMT_CHA_24BPP_MODE		    0x08
+#define  REG_LVDS_FMT_CHB_24BPP_MODE		    0x04
+#define  REG_LVDS_FMT_CHA_24BPP_FORMAT1		    0x02
+#define  REG_LVDS_FMT_CHB_24BPP_FORMAT1		    0x01
+#define REG_LVDS_VCOM				            0x19
+#define  REG_LVDS_VCOM_CHA_LVDS_VOCM		    0x40
+#define  REG_LVDS_VCOM_CHB_LVDS_VOCM		    0x10
+#define  REG_LVDS_VCOM_CHA_LVDS_VOD_SWING(n)	(((n) & 0x3) << 2)
+#define  REG_LVDS_VCOM_CHB_LVDS_VOD_SWING(n)	((n) & 0x3)
+#define REG_LVDS_LANE				            0x1a
+#define  REG_LVDS_LANE_EVEN_ODD_SWAP		    0x40
+#define  REG_LVDS_LANE_CHA_REVERSE_LVDS		    0x20
+#define  REG_LVDS_LANE_CHB_REVERSE_LVDS		    0x10
+#define  REG_LVDS_LANE_CHA_LVDS_TERM		    0x02
+#define  REG_LVDS_LANE_CHB_LVDS_TERM		    0x01
+#define REG_LVDS_CM				                0x1b
+#define  REG_LVDS_CM_CHA_LVDS_CM_ADJUST(n)	    (((n) & 0x3) << 4)
+#define  REG_LVDS_CM_CHB_LVDS_CM_ADJUST(n)	    ((n) & 0x3)
+/* Video registers */
+#define REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW	    0x20
+#define REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH	    0x21
+#define REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW	0x24
+#define REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH	0x25
+#define REG_VID_CHA_SYNC_DELAY_LOW		        0x28
+#define REG_VID_CHA_SYNC_DELAY_HIGH		        0x29
+#define REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW	    0x2c
+#define REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH	    0x2d
+#define REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW	    0x30
+#define REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH	    0x31
+#define REG_VID_CHA_HORIZONTAL_BACK_PORCH	    0x34
+#define REG_VID_CHA_VERTICAL_BACK_PORCH		    0x36
+#define REG_VID_CHA_HORIZONTAL_FRONT_PORCH	    0x38
+#define REG_VID_CHA_VERTICAL_FRONT_PORCH	    0x3a
+#define REG_VID_CHA_TEST_PATTERN		        0x3c
+/* IRQ registers */
+#define REG_IRQ_GLOBAL				            0xe0
+#define  REG_IRQ_GLOBAL_IRQ_EN			        0x01
+#define REG_IRQ_EN				                0xe1
+#define  REG_IRQ_EN_CHA_SYNCH_ERR_EN		    0x80
+#define  REG_IRQ_EN_CHA_CRC_ERR_EN		        0x40
+#define  REG_IRQ_EN_CHA_UNC_ECC_ERR_EN		    0x20
+#define  REG_IRQ_EN_CHA_COR_ECC_ERR_EN		    0x10
+#define  REG_IRQ_EN_CHA_LLP_ERR_EN		        0x08
+#define  REG_IRQ_EN_CHA_SOT_BIT_ERR_EN		    0x04
+#define  REG_IRQ_EN_CHA_PLL_UNLOCK_EN		    0x01
+#define REG_IRQ_STAT				            0xe5
+#define  REG_IRQ_STAT_CHA_SYNCH_ERR		        0x80
+#define  REG_IRQ_STAT_CHA_CRC_ERR		        0x40
+#define  REG_IRQ_STAT_CHA_UNC_ECC_ERR		    0x20
+#define  REG_IRQ_STAT_CHA_COR_ECC_ERR		    0x10
+#define  REG_IRQ_STAT_CHA_LLP_ERR		        0x08
+#define  REG_IRQ_STAT_CHA_SOT_BIT_ERR		    0x04
+#define  REG_IRQ_STAT_CHA_PLL_UNLOCK		    0x01
+
+#define SINGLE_LINK		                        1		
+#define DUAL_LINK		                        2
+
 /* Manufacturer Command Set */
 
 
@@ -62,8 +154,88 @@ static int otm8009a_init_sequence(struct udevice *dev)
 		return ret1;
 	}
 	
-	ret = dm_i2c_reg_read(dev1, 0xe5);
-	//ret = i2c_reg_read(0x2c, 0xe5);
+	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);   //0d
+	mdelay(1);
+	
+	/* Reference clock derived from DSI link clock. */
+	dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);  //0a
+	dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x4E);      //12
+	dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x30);   //0b
+	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);    //0d
+	
+	/* Set number of DSI lanes and LVDS link config. */
+	dm_i2c_reg_write(dev1, REG_DSI_LANE, 0x30);     //10
+	
+	/* No equalization. */
+	dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);       //11
+
+	
+	dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
+	dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
+	dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a
+	dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
+	
+	
+	hback_porch      = 155;  //default_timing->hback_porch.typ;
+	hsync_len        = 10;   //default_timing->hsync_len.typ;
+	vback_porch      = 16;   //default_timing->vback_porch.typ;
+	vsync_len        = 6;    //default_timing->vsync_len.typ;
+	hfront_porch     = 155;  //default_timing->hfront_porch.typ;	
+	hactive          = 1024; //default_timing->hactive.typ;
+	vfront_porch     = 16;   //default_timing->vfront_porch.typ;
+	vactive          = 768;  //default_timing->vactive.typ;
+
+	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20
+	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive>>8)&0xff));      //21
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, (u8)(vactive&0xff));         //24
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, (u8)((vactive>>8)&0xff));   //25
+	
+	
+	/* 32 + 1 pixel clock to ensure proper operation */
+	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_LOW, 0xff);               //28
+	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_HIGH, 0x00);              //29
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, (u8)(hsync_len&0xff));             //2c
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, (u8)((hsync_len>>8)&0xff));       //2d
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, (u8)(vsync_len&0xff));             //30
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, (u8)((vsync_len>>8)&0xff));       //31
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_BACK_PORCH, (u8)(hback_porch&0xff));           //34
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_BACK_PORCH, (u8)(vback_porch&0xff));             //36
+	dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_FRONT_PORCH, (u8)(hfront_porch&0xff));         //38
+	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_FRONT_PORCH, (u8)(vfront_porch&0xff));           //3a
+	dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);                 //3c
+	
+	/* Enable PLL */
+	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
+	
+	for(i=0; i<10; i++)
+	{
+		mdelay(1);
+		val=0;
+		val = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
+		if(val & 0x80 == 0x80)
+		{
+			pll_en_flag = true;
+			break;
+		}
+	}
+	
+	if (pll_en_flag==false) {
+		log_info("tianma: (attach) failed to lock PLL \n");
+		/* On failure, disable PLL again and exit. */
+		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
+		return -EINVAL;
+	}
+	/* Trigger reset after CSR register update. */
+	dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
+	mdelay(10);
+	
+	/* Clear all errors that got asserted during initialization. */
+	val=0;
+	val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
+	dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+	
+
 
 	log_info("driver: %d \n", ret);
 	
