@@ -49,9 +49,11 @@ static int otm8009a_init_sequence(struct udevice *dev)
 {
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	struct mipi_dsi_device *device = plat->device;
-	int ret;
+	uchar ret;
+	
+	ret = i2c_reg_read(0x2c, 0xe5);
 
-	log_info("driver: %x",i2c_reg_read(0x2c, 0xe5));
+	log_info("driver: %d", ret);
 	
 
 	return 0;
@@ -121,10 +123,10 @@ static int otm8009a_panel_probe(struct udevice *dev)
 			return ret;
 	}	
 
-	/* reset panel */
+	/* enable panel */
 	dm_gpio_set_value(&priv->enable, false);
 	mdelay(10); /* >50us */
-	dm_gpio_set_value(&priv->reset, true);
+	dm_gpio_set_value(&priv->enable, true);
 	mdelay(10); /* >5ms */
 
 	/* fill characteristics of DSI data link */
