@@ -59,10 +59,10 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	if (ret1) {
 		log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
 		       3);
-		return 0;
+		return ret1;
 	}
 	
-	ret = dm_i2c_reg_read(dev, 0xe5);
+	ret = dm_i2c_reg_read(dev1, 0xe5);
 	//ret = i2c_reg_read(0x2c, 0xe5);
 
 	log_info("driver: %d \n", ret);
