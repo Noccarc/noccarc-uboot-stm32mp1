@@ -22,6 +22,7 @@
 #include <i2c.h>
 #include <command.h>
 
+
 #define OTM8009A_BACKLIGHT_DEFAULT	100
 #define OTM8009A_BACKLIGHT_MAX		255
 
@@ -123,6 +124,7 @@
 struct otm8009a_panel_priv {
 	struct udevice *reg;
 	struct gpio_desc enable;
+	struct udevice *backlight;
 };
 
 static const struct display_timing default_timing = {
@@ -314,6 +316,18 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	
 	log_info("driver: Entered enable backlight \n");
 
+	ret = backlight_set_brightness(priv->backlight, 50);
+	if (ret){
+		log_info("driver: set brightness failed \n");
+		return ret;
+	}
+	
+	ret = backlight_enable(priv->backlight);
+	if (ret){
+		log_info("driver: bawandar!!!!!!!!!!!!!!!!!!!!, barish shuru ho gayi hai..... \n");
+		return ret;
+	}
+	
 	ret = mipi_dsi_attach(device);
 	if (ret < 0)
 		return ret;
@@ -357,6 +371,14 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 		log_info("driver: enable gpio not found\n");
 		if (ret != -ENOENT)
 			return ret;	
+	}
+	
+	ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
+					   "backlight", &priv->backlight);
+	if (ret) {
+		log_info("driver: eee nahi  mil raha... \n");
+		dev_err(dev, "Cannot get backlight: ret=%d\n", ret);
+		return ret;
 	}
 
 	return 0;
