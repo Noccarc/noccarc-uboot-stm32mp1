@@ -162,55 +162,21 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	}
 	
 	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);   //0d
-	k = dm_i2c_reg_read(dev1, REG_RC_PLL_EN);
-	log_info("driver: %d -> %d \n",k, REG_RC_PLL_EN);
-	
 	mdelay(1);
-	
 	/* Reference clock derived from DSI link clock. */
 	dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);  //0a
-	k = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
-	log_info("driver: %d -> %d \n",k, REG_RC_LVDS_PLL);
-	
 	dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x48);      //12
-	k = dm_i2c_reg_read(dev1, REG_DSI_CLK);
-	log_info("driver: %d -> %d \n",k, REG_DSI_CLK);
-	
 	dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x28);   //0b
-	k = dm_i2c_reg_read(dev1, REG_RC_DSI_CLK);
-	log_info("driver: %d -> %d \n",k, REG_RC_DSI_CLK);
-	
 	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);    //0d
-	k = dm_i2c_reg_read(dev1, REG_RC_PLL_EN);
-	log_info("driver: %d -> %d \n",k, REG_RC_PLL_EN);
-	
 	/* Set number of DSI lanes and LVDS link config. */
 	dm_i2c_reg_write(dev1, REG_DSI_LANE, 0x30);     //10
-	k = dm_i2c_reg_read(dev1, REG_DSI_LANE);
-	log_info("driver: %d -> %d \n",k, REG_DSI_LANE);
-	
 	/* No equalization. */
 	dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);       //11
-	k = dm_i2c_reg_read(dev1, REG_DSI_EQ);
-	log_info("driver: %d -> %d \n",k, REG_DSI_EQ);
-
-	
 	dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
-	k = dm_i2c_reg_read(dev1, REG_LVDS_FMT);
-	log_info("driver: %d -> %d \n",k, REG_LVDS_FMT);
-	
 	dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
-	k = dm_i2c_reg_read(dev1, REG_LVDS_VCOM);
-	log_info("driver: %d -> %d \n",k, REG_LVDS_VCOM);
-	
-	dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a
-	k = dm_i2c_reg_read(dev1, REG_LVDS_LANE);
-	log_info("driver: %d -> %d \n",k, REG_LVDS_LANE);
-	
+	dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a	
 	dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
-	k = dm_i2c_reg_read(dev1, REG_LVDS_CM);
-	log_info("driver: %d -> %d \n",k, REG_LVDS_CM);
-	
+		
 	
 	hback_porch      = 155;  //default_timing->hback_porch.typ;
 	hsync_len        = 10;   //default_timing->hsync_len.typ;
@@ -222,43 +188,17 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	vactive          = 768;  //default_timing->vactive.typ;
 
 	
-	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW);
-	
-	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive>>8)&0xff));      //21
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH);
-	
+	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20		
+	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive>>8)&0xff));      //21	
 	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, (u8)(vactive&0xff));         //24
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW);
-	
 	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, (u8)((vactive>>8)&0xff));   //25
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH);
-	
 	/* 32 + 1 pixel clock to ensure proper operation */
 	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_LOW, 0xff);               //28
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_SYNC_DELAY_LOW);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_SYNC_DELAY_LOW);
-	
 	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_HIGH, 0x00);              //29
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_SYNC_DELAY_HIGH);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_SYNC_DELAY_HIGH);
-	
 	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, (u8)(hsync_len&0xff));             //2c
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW);
-	
 	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, (u8)((hsync_len>>8)&0xff));       //2d
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH);
-	
 	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, (u8)(vsync_len&0xff));             //30
-	k = dm_i2c_reg_read(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW);
-	log_info("driver: %d -> %d \n",k, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW);
-	
+		
 	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, (u8)((vsync_len>>8)&0xff));       //31
 	dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_BACK_PORCH, (u8)(hback_porch&0xff));           //34
 	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_BACK_PORCH, (u8)(vback_porch&0xff));             //36
@@ -268,8 +208,6 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	
 	/* Enable PLL */
 	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
-	k = dm_i2c_reg_read(dev1, REG_RC_PLL_EN);
-	log_info("driver: %d -> %d \n",k, REG_RC_PLL_EN);
 	
 	for(i=0; i<10; i++)
 	{
@@ -291,8 +229,6 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	}
 	/* Trigger reset after CSR register update. */
 	dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
-	k = dm_i2c_reg_read(dev1, REG_RC_RESET);
-	log_info("driver: %d -> %d \n",k, REG_RC_RESET);
 	mdelay(10);
 	
 	/* Clear all errors that got asserted during initialization. */
@@ -300,11 +236,6 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
 	dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
 	
-
-
-	log_info("driver: %d \n", val);
-	
-
 	return 0;
 }
 
