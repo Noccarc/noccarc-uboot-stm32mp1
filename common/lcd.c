@@ -585,9 +585,8 @@ int lcd_display_bitmap(ulong bmp_image, int x, int y)
 
 	colors = 1 << bmp_bpix;
 
-	//bpix = NBITS(panel_info.vl_bpix);
-	bpix = 32;
-
+	bpix = NBITS(panel_info.vl_bpix);
+	
 	if (bpix != 1 && bpix != 8 && bpix != 16 && bpix != 32) {
 		printf ("Error: %d bit/pixel mode, but BMP has %d bit/pixel\n",
 			bpix, bmp_bpix);
