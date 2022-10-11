@@ -6,7 +6,7 @@
 ifdef CONFIG_DM
 obj-$(CONFIG_BACKLIGHT) += backlight-uclass.o
 obj-$(CONFIG_BACKLIGHT_GPIO) += backlight_gpio.o
-obj-$(CONFIG_BACKLIGHT_PWM) += pwm_backlight.o
+#obj-$(CONFIG_BACKLIGHT_PWM) += pwm_backlight.o
 obj-$(CONFIG_CONSOLE_NORMAL) += console_normal.o
 obj-$(CONFIG_CONSOLE_ROTATION) += console_rotate.o
 obj-$(CONFIG_CONSOLE_TRUETYPE) += console_truetype.o fonts/
@@ -18,6 +18,7 @@ obj-$(CONFIG_PANEL) += panel-uclass.o
 obj-$(CONFIG_SIMPLE_PANEL) += simple_panel.o
 endif
 
+obj-$(CONFIG_BACKLIGHT_PWM) += pwm_backlight.o
 obj-${CONFIG_EXYNOS_FB} += exynos/
 obj-${CONFIG_VIDEO_ROCKCHIP} += rockchip/
 obj-${CONFIG_VIDEO_STM32} += stm32/
