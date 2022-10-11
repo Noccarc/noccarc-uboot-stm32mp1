@@ -21,6 +21,7 @@
 #include <power/regulator.h>
 #include <i2c.h>
 #include <command.h>
+#include <pwm.h>
 
 
 #define OTM8009A_BACKLIGHT_DEFAULT	100
@@ -125,6 +126,7 @@ struct otm8009a_panel_priv {
 	struct udevice *reg;
 	struct gpio_desc enable;
 	struct udevice *backlight;
+	struct ofnode_phandle_args args;
 };
 
 static const struct display_timing default_timing = {
@@ -254,10 +256,16 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 		// return ret;
 	// }
 	
-	ret = backlight_enable(priv->backlight);
+	// ret = backlight_enable(priv->backlight);
+	// if (ret){
+		// log_info("driver: bawandar!!!!!!!!!!!!!!!!!!!!, barish shuru ho gayi hai..... \n");
+		// return ret;
+	// }
+	
+	ret = pwm_set_config(priv->args, 0, 500000, 50);
 	if (ret){
-		log_info("driver: bawandar!!!!!!!!!!!!!!!!!!!!, barish shuru ho gayi hai..... \n");
-		return ret;
+		log_info("driver: cannot set pwm");
+		return log_ret(ret);
 	}
 	
 	ret = mipi_dsi_attach(device);
@@ -305,11 +313,19 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 			return ret;	
 	}
 	
+	// ret = uclass_get_device_by_phandle(UCLASS_PWM, dev,
+					   // "backlight", &priv->backlight);
+	// if (ret) {
+		// log_info("driver: eee nahi  mil raha... \n");
+		// dev_err(dev, "Cannot get backlight: ret=%d\n", ret);
+		// return ret;
+	// }
+	
 	ret = uclass_get_device_by_phandle(UCLASS_PWM, dev,
-					   "backlight", &priv->backlight);
+					   "pwms", &priv->args);
 	if (ret) {
-		log_info("driver: eee nahi  mil raha... \n");
-		dev_err(dev, "Cannot get backlight: ret=%d\n", ret);
+		log_info("driver: Cannot get pwm \n");
+		dev_err(dev, "Cannot get pwm: ret=%d\n", ret);
 		return ret;
 	}
 
