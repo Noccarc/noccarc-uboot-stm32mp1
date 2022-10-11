@@ -317,11 +317,11 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	
 	log_info("driver: Entered enable backlight \n");
 
-	ret = backlight_set_brightness(priv->backlight, 50);
-	if (ret){
-		log_info("driver: set brightness failed \n");
-		return ret;
-	}
+	// ret = backlight_set_brightness(priv->backlight, 50);
+	// if (ret){
+		// log_info("driver: set brightness failed \n");
+		// return ret;
+	// }
 	
 	ret = backlight_enable(priv->backlight);
 	if (ret){
