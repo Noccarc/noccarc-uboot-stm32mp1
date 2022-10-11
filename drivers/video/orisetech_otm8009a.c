@@ -126,7 +126,7 @@ struct otm8009a_panel_priv {
 	struct udevice *reg;
 	struct gpio_desc enable;
 	struct udevice *backlight;
-	struct ofnode_phandle_args args;
+	struct udevice *args;
 };
 
 static const struct display_timing default_timing = {
