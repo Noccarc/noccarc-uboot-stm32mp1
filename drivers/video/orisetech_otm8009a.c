@@ -312,6 +312,7 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 {
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	struct mipi_dsi_device *device = plat->device;
+	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	int ret;
 	
 	log_info("driver: Entered enable backlight \n");
