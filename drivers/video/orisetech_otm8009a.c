@@ -313,7 +313,7 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 			return ret;	
 	}
 	
-	 ret = uclass_get_device_by_phandle(UCLASS_PWM_BACKLIGHT, dev,
+	 ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
 					    "backlight", &priv->backlight);
 	 if (ret) {
 		 log_info("driver: eee nahi  mil raha... \n");
