@@ -292,7 +292,8 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 {
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	int ret;
-	struct ofnode_phandle_args args;
+	//struct ofnode_phandle_args args;
+	ofnode node;
 
     log_info("driver: Entered of to plat \n");
 	
@@ -322,14 +323,20 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 		// return ret;
 	// }
 	
-	ret = dev_read_phandle_with_args(dev, "pwms", NULL, 1, 0, &args);
-	if (ret) {
-		log_info("driver: Cannot get PWM phandle: \n");
-		debug("%s: Cannot get PWM phandle: ret=%d\n", __func__, ret);
-		return ret;
+	// ret = dev_read_phandle_with_args(dev, "pwms", "#pwm-cells", 0, 0, &args);
+	// if (ret) {
+		// log_info("driver: Cannot get PWM phandle: \n");
+		// debug("%s: Cannot get PWM phandle: ret=%d\n", __func__, ret);
+		// return ret;
+	// }
+	
+	node = ofnode_path("/soc/timer@40007000/pwm");
+	if (!ofnode_valid(node)) {
+		log_info("driver: Cannot get pwm node \n");
+		return -ENOENT;
 	}
 	
-	ret = uclass_get_device_by_ofnode(UCLASS_PWM, args.node, &priv->pwm);
+	ret = uclass_get_device_by_ofnode(UCLASS_PWM, node, &priv->pwm);
 	if (ret) {
 		log_info("driver: Cannot get pwm \n");
 		dev_err(dev, "Cannot get pwm: ret=%d\n", ret);
