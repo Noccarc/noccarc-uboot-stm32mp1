@@ -322,7 +322,7 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 		// return ret;
 	// }
 	
-	ret = dev_read_phandle_with_args(dev, "pwms", "#pwm-cells", 0, 1, &args);
+	ret = dev_read_phandle_with_args(dev, "pwms", "#pwm-cells", 0, 2, &args);
 	if (ret) {
 		log_info("driver: Cannot get PWM phandle: \n");
 		debug("%s: Cannot get PWM phandle: ret=%d\n", __func__, ret);
