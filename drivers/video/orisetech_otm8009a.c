@@ -7,8 +7,8 @@
  * This otm8009a panel driver is inspired from the Linux Kernel driver
  * drivers/gpu/drm/panel/panel-orisetech-otm8009a.c.
  */
-#define LOG_DEBUG
-#define LOG_CATEGORY LOGC_DM
+//#define LOG_DEBUG
+//#define LOG_CATEGORY LOGC_DM
 
 #include <common.h>
 #include <backlight.h>
@@ -256,21 +256,21 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 		// return ret;
 	// }
 	
-	// ret = backlight_enable(priv->backlight);
-	// if (ret){
-		// log_info("driver: bawandar!!!!!!!!!!!!!!!!!!!!, barish shuru ho gayi hai..... \n");
-		// return ret;
-	// }
-	
-	ret = pwm_set_config(priv->args, 0, 500000, 50);
-	if (ret){
-		log_info("driver: cannot set pwm");
-		return log_ret(ret);
-	}
+	//ret = pwm_set_config(priv->args, 0, 500000, 50);
+	//if (ret){
+		//log_info("driver: cannot set pwm");
+		//return log_ret(ret);
+	//}
 	
 	ret = mipi_dsi_attach(device);
 	if (ret < 0)
 		return ret;
+	
+	ret = backlight_enable(priv->backlight);
+	 if (ret){
+		 log_info("driver: bawandar!!!!!!!!!!!!!!!!!!!!, barish shuru ho gayi hai..... \n");
+		 return ret;
+	 }
 
 	ret = otm8009a_init_sequence(dev);
 	if (ret)
@@ -313,21 +313,21 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 			return ret;	
 	}
 	
-	// ret = uclass_get_device_by_phandle(UCLASS_PWM, dev,
-					   // "backlight", &priv->backlight);
-	// if (ret) {
-		// log_info("driver: eee nahi  mil raha... \n");
-		// dev_err(dev, "Cannot get backlight: ret=%d\n", ret);
-		// return ret;
-	// }
+	 ret = uclass_get_device_by_phandle(UCLASS_PWM_BACKLIGHT, dev,
+					    "backlight", &priv->backlight);
+	 if (ret) {
+		 log_info("driver: eee nahi  mil raha... \n");
+		 dev_err(dev, "Cannot get backlight: ret=%d\n", ret);
+		 return ret;
+	 }
 	
-	ret = uclass_get_device_by_phandle(UCLASS_PWM, dev,
-					   "pwms", &priv->args);
-	if (ret) {
-		log_info("driver: Cannot get pwm \n");
-		dev_err(dev, "Cannot get pwm: ret=%d\n", ret);
-		return ret;
-	}
+	//ret = uclass_get_device_by_phandle(UCLASS_PWM, dev,
+					  // "pwms", &priv->args);
+	//if (ret) {
+		//log_info("driver: Cannot get pwm \n");
+		//dev_err(dev, "Cannot get pwm: ret=%d\n", ret);
+		//return ret;
+	//}
 
 	return 0;
 }
