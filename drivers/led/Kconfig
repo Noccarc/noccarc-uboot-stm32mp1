@@ -8,13 +8,6 @@ config LED
 	  U-Boot provides a uclass API to implement this feature. LED drivers
 	  can provide access to board-specific LEDs. Use of the device tree
 	  for configuration is encouraged.
-	  
-config LED_PWM
-	bool "LED PWM"
-	depends on LED && DM_PWM
-	help
-	  Enable support for LEDs connected to PWM.
-	  Linux compatible ofdata.
 
 config LED_BCM6328
 	bool "LED Support for BCM6328"
