@@ -142,12 +142,15 @@ int lists_bind_fdt(struct udevice *parent, ofnode node, struct udevice **devp,
 	if (devp)
 		*devp = NULL;
 	name = ofnode_get_name(node);
-	log_info("bind node %s\n", name);
+	//log_info("bind node %s\n", name);
+	log_debug("bind node %s\n", name);
 
 	compat_list = ofnode_get_property(node, "compatible", &compat_length);
 	if (!compat_list) {
 		if (compat_length == -FDT_ERR_NOTFOUND) {
-			log_info("Device '%s' has no compatible string\n",
+			//log_info("Device '%s' has no compatible string\n",
+				  //name);
+			log_debug("Device '%s' has no compatible string\n",
 				  name);
 			return 0;
 		}
@@ -163,7 +166,8 @@ int lists_bind_fdt(struct udevice *parent, ofnode node, struct udevice **devp,
 	 */
 	for (i = 0; i < compat_length; i += strlen(compat) + 1) {
 		compat = compat_list + i;
-		log_info("   - attempt to match compatible string '%s'\n",
+		//log_info("   - attempt to match compatible string '%s'\n",
+		log_debug("   - attempt to match compatible string '%s'\n",
 			  compat);
 
 		for (entry = driver; entry != driver + n_ents; entry++) {
@@ -178,18 +182,20 @@ int lists_bind_fdt(struct udevice *parent, ofnode node, struct udevice **devp,
 		if (pre_reloc_only) {
 			if (!ofnode_pre_reloc(node) &&
 			    !(entry->flags & DM_FLAG_PRE_RELOC)) {
-				log_info("Skipping device pre-relocation\n");
+				//log_info("Skipping device pre-relocation\n");
+				log_debug("Skipping device pre-relocation\n");
 				return 0;
 			}
 		}
 
-		log_info("   - found match at '%s': '%s' matches '%s'\n",
+		//log_info("   - found match at '%s': '%s' matches '%s'\n",
 			  entry->name, entry->of_match->compatible,
 			  id->compatible);
 		ret = device_bind_with_driver_data(parent, entry, name,
 						   id->data, node, &dev);
 		if (ret == -ENODEV) {
-			log_info("Driver '%s' refuses to bind\n", entry->name);
+			//log_info("Driver '%s' refuses to bind\n", entry->name);
+			log_debug("Driver '%s' refuses to bind\n", entry->name);
 			continue;
 		}
 		if (ret) {
@@ -205,7 +211,8 @@ int lists_bind_fdt(struct udevice *parent, ofnode node, struct udevice **devp,
 	}
 
 	if (!found && !result && ret != -ENODEV)
-		log_info("No match for node '%s'\n", name);
+		//log_info("No match for node '%s'\n", name);
+		log_debug("No match for node '%s'\n", name);
 
 	return result;
 }
