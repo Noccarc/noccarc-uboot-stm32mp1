@@ -158,8 +158,8 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	ret1 = i2c_get_chip_for_busnum(3, 0x2c,
 				      1, &dev1);
 	if (ret1) {
-		log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
-		       3);
+		//log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
+		       //3);
 		return ret1;
 	}
 	
@@ -224,7 +224,7 @@ static int otm8009a_init_sequence(struct udevice *dev)
 	}
 	
 	if (pll_en_flag==false) {
-		log_info("tianma: (attach) failed to lock PLL \n");
+		//log_info("tianma: (attach) failed to lock PLL \n");
 		/* On failure, disable PLL again and exit. */
 		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
 		return -EINVAL;
@@ -248,7 +248,7 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	int ret;
 	
-	log_info("driver: Entered enable backlight \n");
+	//log_info("driver: Entered enable backlight \n");
 
 	// ret = backlight_set_brightness(priv->backlight, 50);
 	// if (ret){
@@ -266,15 +266,15 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	if (ret < 0)
 		return ret;
 	
-	ret = backlight_enable(priv->backlight);
-	 if (ret){
-		 log_info("driver: bawandar!!!!!!!!!!!!!!!!!!!!, barish shuru ho gayi hai..... \n");
-		 return ret;
-	 }
-
 	ret = otm8009a_init_sequence(dev);
 	if (ret)
 		return ret;
+	
+	ret = backlight_enable(priv->backlight);
+	 if (ret){
+		 //log_info("driver: bawandar!!!!!!!!!!!!!!!!!!!!, barish shuru ho gayi hai..... \n");
+		 return ret;
+	 }
 	
 
 	return 0;
@@ -293,7 +293,7 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	int ret;
 
-    log_info("driver: Entered of to plat \n");
+    //log_info("driver: Entered of to plat \n");
 	
 	if (IS_ENABLED(CONFIG_DM_REGULATOR)) {
 		ret =  device_get_supply_regulator(dev, "power-supply",
@@ -308,7 +308,7 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 				   GPIOD_IS_OUT_ACTIVE);
 	if (ret) {
 		dev_err(dev, "warning: cannot get enable GPIO\n");
-		log_info("driver: enable gpio not found\n");
+		//log_info("driver: enable gpio not found\n");
 		if (ret != -ENOENT)
 			return ret;	
 	}
@@ -316,7 +316,7 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 	 ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
 					    "backlight", &priv->backlight);
 	 if (ret) {
-		 log_info("driver: eee nahi  mil raha... \n");
+		 //log_info("driver: eee nahi  mil raha... \n");
 		 dev_err(dev, "Cannot get backlight: ret=%d\n", ret);
 		 return ret;
 	 }
@@ -338,7 +338,7 @@ static int otm8009a_panel_probe(struct udevice *dev)
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	int ret;
 	
-	log_info("driver: Entered probe \n");
+	//log_info("driver: Entered probe \n");
 	
 	if (IS_ENABLED(CONFIG_DM_REGULATOR) && priv->reg) {
 		dev_dbg(dev, "enable regulator '%s'\n", priv->reg->name);
