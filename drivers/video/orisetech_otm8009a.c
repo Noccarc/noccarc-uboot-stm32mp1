@@ -330,7 +330,7 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 		// return ret;
 	// }
 	
-	node = ofnode_path("/soc/timer@40007000/pwm");
+	node = ofnode_path("/soc/timer@40007000/pwm13");
 	if (!ofnode_valid(node)) {
 		log_info("driver: Cannot get pwm node \n");
 		return -ENOENT;
