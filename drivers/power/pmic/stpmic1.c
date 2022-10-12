@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 2018, STMicroelectronics - All Rights Reserved
  */
-#define LOG_DEBUG
-#define LOG_CATEGORY LOGC_DM
+//#define LOG_DEBUG
+//#define LOG_CATEGORY LOGC_DM
 
 #include <common.h>
 #include <dm.h>
