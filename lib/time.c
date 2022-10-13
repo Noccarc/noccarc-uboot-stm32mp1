@@ -24,7 +24,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_SYS_TIMER_RATE
 /* Returns tick rate in ticks per second */
-ulong notrace __weak get_tbclk(void)
+ulong __weak notrace get_tbclk(void)
 {
 	return CONFIG_SYS_TIMER_RATE;
 }
