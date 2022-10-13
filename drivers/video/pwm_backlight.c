@@ -4,9 +4,7 @@
  * Written by Simon Glass <sjg@chromium.org>
  */
 
-//#define LOG_CATEGORY UCLASS_PANEL_BACKLIGHT
-#define LOG_DEBUG
-#define LOG_CATEGORY LOGC_DM
+#define LOG_CATEGORY UCLASS_PANEL_BACKLIGHT
 
 #include <common.h>
 #include <dm.h>
@@ -90,11 +88,11 @@ static int enable_sequence(struct udevice *dev, int seq)
 				*plat;
 
 			plat = dev_get_uclass_platdata(priv->reg);
-			log_debug("Enable '%s', regulator '%s'/'%s'\n",
+			log_info("Enable '%s', regulator '%s'/'%s'\n",
 				  dev->name, priv->reg->name, plat->name);
 			ret = regulator_set_enable(priv->reg, true);
 			if (ret) {
-				log_debug("Cannot enable regulator for PWM '%s'\n",
+				log_info("Cannot enable regulator for PWM '%s'\n",
 					  dev->name);
 				return log_ret(ret);
 			}
@@ -191,28 +189,28 @@ static int pwm_backlight_ofdata_to_platdata(struct udevice *dev)
 	int index, ret, count, len;
 	const u32 *cell;
 
-	log_debug("start\n");
+	log_info("start\n");
 	ret = uclass_get_device_by_phandle(UCLASS_REGULATOR, dev,
 					   "power-supply", &priv->reg);
 	if (ret)
-		log_debug("Cannot get power supply: ret=%d\n", ret);
+		log_info("Cannot get power supply: ret=%d\n", ret);
 	ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
 				   GPIOD_IS_OUT);
 	if (ret) {
-		log_debug("Warning: cannot get enable GPIO: ret=%d\n", ret);
+		log_info("Warning: cannot get enable GPIO: ret=%d\n", ret);
 		if (ret != -ENOENT)
 			return log_ret(ret);
 	}
 	ret = dev_read_phandle_with_args(dev, "pwms", "#pwm-cells", 0, 0,
 					 &args);
 	if (ret) {
-		log_debug("Cannot get PWM phandle: ret=%d\n", ret);
+		log_info("Cannot get PWM phandle: ret=%d\n", ret);
 		return log_ret(ret);
 	}
 
 	ret = uclass_get_device_by_ofnode(UCLASS_PWM, args.node, &priv->pwm);
 	if (ret) {
-		log_debug("Cannot get PWM: ret=%d\n", ret);
+		log_info("Cannot get PWM: ret=%d\n", ret);
 		return log_ret(ret);
 	}
 	if (args.args_count < 2)
@@ -239,7 +237,7 @@ static int pwm_backlight_ofdata_to_platdata(struct udevice *dev)
 		priv->max_level = 255;
 	}
 	priv->cur_level = priv->default_level;
-	log_debug("done\n");
+	log_info("done\n");
 
 
 	return 0;
