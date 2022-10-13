@@ -262,11 +262,11 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 		// return ret;
 	// }
 	
-	ret = pwm_set_config(priv->pwm, 0, 500000, 50);
-	if (ret){
-		log_info("driver: cannot set pwm");
-		return log_ret(ret);
-	}
+	// ret = pwm_set_config(priv->pwm, 0, 500000, 50);
+	// if (ret){
+		// log_info("driver: cannot set pwm");
+		// return log_ret(ret);
+	// }
 	
 	ret = mipi_dsi_attach(device);
 	if (ret < 0)
