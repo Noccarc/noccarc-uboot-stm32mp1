@@ -24,6 +24,9 @@
 /* Auto reload register for free running config */
 #define GPT_FREE_RUNNING	0xFFFFFFFF
 
+/* Added CONFIG_SYS_HZ_CLOCK variable to 1MHZ */
+#define CONFIG_SYS_HZ_CLOCK 1000000
+
 struct stm32_timer_regs {
 	u32 cr1;
 	u32 cr2;
