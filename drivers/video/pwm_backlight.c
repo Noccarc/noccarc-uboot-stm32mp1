@@ -4,7 +4,9 @@
  * Written by Simon Glass <sjg@chromium.org>
  */
 
-#define LOG_CATEGORY UCLASS_PANEL_BACKLIGHT
+//#define LOG_CATEGORY UCLASS_PANEL_BACKLIGHT
+#define LOG_DEBUG
+#define LOG_CATEGORY LOGC_DM
 
 #include <common.h>
 #include <dm.h>
