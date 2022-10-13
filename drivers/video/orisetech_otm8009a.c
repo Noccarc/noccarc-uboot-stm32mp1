@@ -249,12 +249,19 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	int ret;
 	
 	log_info("driver: Entered enable backlight \n");
+	
+	ret = backlight_enable(priv->backlight);
+	if (ret){
+		log_info("driver: set enable failed \n");
+		return ret;
+	}
+	
 
-	// ret = backlight_set_brightness(priv->backlight, 50);
-	// if (ret){
-		// log_info("driver: set brightness failed \n");
-		// return ret;
-	// }
+	 ret = backlight_set_brightness(priv->backlight, 50);
+	 if (ret){
+		 log_info("driver: set brightness failed \n");
+		 return ret;
+	 }
 	
 	// ret = backlight_enable(priv->backlight);
 	// if (ret){
@@ -292,8 +299,6 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 {
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 	int ret;
-	struct ofnode_phandle_args args;
-	//ofnode node;
 
     log_info("driver: Entered of to plat \n");
 	
@@ -313,6 +318,13 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 		log_info("driver: enable gpio not found\n");
 		if (ret != -ENOENT)
 			return ret;	
+	}
+	
+	ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
+					   "backlight", &priv->backlight);
+	if (ret) {
+		log_info("%s: Cannot get backlight: ret=%d\n", __func__, ret);
+		return ret;
 	}
 	
 	// ret = uclass_get_device_by_phandle(UCLASS_PWM, dev,
