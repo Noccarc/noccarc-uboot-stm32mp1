@@ -247,6 +247,7 @@ static int pwm_backlight_ofdata_to_platdata(struct udevice *dev)
 
 static int pwm_backlight_probe(struct udevice *dev)
 {
+	log_info("in probe done\n");
 	return 0;
 }
 
