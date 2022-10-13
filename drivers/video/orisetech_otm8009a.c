@@ -246,18 +246,18 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 	struct mipi_dsi_device *device = plat->device;
 	struct otm8009a_panel_priv *priv = dev_get_priv(dev);
-	int ret;
+	int ret = 0;
 	
 	log_info("driver: Entered enable backlight \n");
 	
-	ret = backlight_enable(priv->backlight);
+	//ret = backlight_enable(priv->backlight);
 	if (ret){
 		log_info("driver: set enable failed \n");
 		return ret;
 	}
 	
 
-	 ret = backlight_set_brightness(priv->backlight, 50);
+	// ret = backlight_set_brightness(priv->backlight, 50);
 	 if (ret){
 		 log_info("driver: set brightness failed \n");
 		 return ret;
