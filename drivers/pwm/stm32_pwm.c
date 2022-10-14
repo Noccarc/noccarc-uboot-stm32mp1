@@ -168,7 +168,7 @@ U_BOOT_DRIVER(stm32_pwm) = {
 	.name = "stm32_pwm",
 	.id = UCLASS_PWM,
 	.of_match = stm32_pwm_ids,
-	.priv_auto	= sizeof(struct stm32_pwm_priv),
+	.priv_auto_alloc_size = sizeof(struct stm32_pwm_priv),
 	.probe = stm32_pwm_probe,
 	.ops = &stm32_pwm_ops,
 };
