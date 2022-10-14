@@ -68,3 +68,10 @@ config PWM_SUNXI
 	help
 	  This PWM is found on H3, A64 and other Allwinner SoCs. It supports a
 	  programmable period and duty cycle. A 16-bit counter is used.
+	  
+config PWM_STM32
+	bool "Enable support for the STM32MP1 PWM"
+	depends on DM_PWM
+	help
+	  This PWM is found on F7 ,A7 and other STM32MP1 SoCs. It supports a
+	  programmable period and duty cycle. A 16-bit counter is used.
