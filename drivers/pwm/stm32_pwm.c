@@ -10,7 +10,7 @@
 #include <clk.h>
 #include <dm.h>
 #include <fdtdec.h>
-#include <pwn.h>
+#include <pwm.h>
 #include <dm/device_compat.h>
 #include <linux/bitops.h>
 
