@@ -74,7 +74,8 @@ static int stm32_timer_probe(struct udevice *dev)
 	fdt_addr_t addr;
 	int ret;
 	u32 rate, psc;
-
+	
+	log_info("timer: entered probe\n");
 	addr = dev_read_addr(dev);
 	if (addr == FDT_ADDR_T_NONE)
 		return -EINVAL;
