@@ -320,13 +320,14 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 			return ret;	
 	}
 	
+	/*
 	ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
 					   "backlight", &priv->backlight);
 	if (ret) {
 		log_info("%s: Cannot get backlight: ret=%d\n", __func__, ret);
 		return ret;
 	}
-	
+	*/
 	// ret = uclass_get_device_by_phandle(UCLASS_PWM, dev,
 					   // "backlight", &priv->backlight);
 	// if (ret) {
