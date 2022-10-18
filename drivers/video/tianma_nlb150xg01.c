@@ -250,6 +250,12 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	
 	log_info("driver: Entered enable backlight \n");
 	
+	ret = backlight_enable(priv->backlight);
+	if (ret){
+		log_info("driver: set enable failed \n");
+		return ret;
+	}
+	
 	ret = mipi_dsi_attach(device);
 	if (ret < 0)
 		return ret;
@@ -258,11 +264,7 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	if (ret)
 		return ret;
 	
-	ret = backlight_enable(priv->backlight);
-	if (ret){
-		log_info("driver: set enable failed \n");
-		return ret;
-	}
+	
 	
 
 	return 0;
