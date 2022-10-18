@@ -250,7 +250,6 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	
 	log_info("driver: Entered enable backlight \n");
 	
-	
 	ret = mipi_dsi_attach(device);
 	if (ret < 0)
 		return ret;
@@ -258,6 +257,12 @@ static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	ret = otm8009a_init_sequence(dev);
 	if (ret)
 		return ret;
+	
+	ret = backlight_enable(priv->backlight);
+	if (ret){
+		log_info("driver: set enable failed \n");
+		return ret;
+	}
 	
 
 	return 0;
@@ -294,6 +299,13 @@ static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
 		log_info("driver: enable gpio not found\n");
 		if (ret != -ENOENT)
 			return ret;	
+	}
+	
+	ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
+					   "backlight", &priv->backlight);
+	if (ret) {
+		log_info("%s: Cannot get backlight: ret=%d\n", __func__, ret);
+		return ret;
 	}
 	
 
