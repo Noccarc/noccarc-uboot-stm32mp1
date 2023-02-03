@@ -38,6 +38,7 @@
 #define BOOTENV_DEV_BLKDEV(devtypeu, devtypel, instance) \
 	"bootcmd_" #devtypel #instance "=" \
 		"devnum=" #instance "; " \
+		"setenv silent 1; " \
 		"run " #devtypel "_boot\0"
 
 #define BOOTENV_DEV_NAME_BLKDEV(devtypeu, devtypel, instance) \
