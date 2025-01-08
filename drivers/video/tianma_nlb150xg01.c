@@ -125,6 +125,7 @@
 	struct otm8009a_panel_priv {
 		struct udevice *reg;
 		struct gpio_desc enable;
+                struct gpio_desc backlight_enable;
 		struct udevice *backlight;
 		struct udevice *pwm;
 	};
