@@ -249,7 +249,7 @@
 		int ret = 0;
 		
 		log_info("driver: Entered enable backlight \n");
-				
+		dm_gpio_set_value(&priv->enable, true);		
 		ret = mipi_dsi_attach(device);
 		if (ret < 0)
 			return ret;
@@ -258,7 +258,7 @@
 		if (ret)
 			return ret;
 		
-		mdelay(10);
+		mdelay(500);
 		ret = backlight_enable(priv->backlight);
 		if (ret){
 			log_info("driver: set enable failed \n");
