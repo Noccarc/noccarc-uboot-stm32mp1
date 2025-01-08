@@ -296,7 +296,7 @@
 			}
 		}
 
-		ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
+		ret = gpio_request_by_name(dev, "backligh-gpios", 0, &priv->backlight_enable,
 					   GPIOD_IS_OUT_ACTIVE);
 		
 		ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
