@@ -266,7 +266,7 @@
 			return ret;
 		}
 		
-		mdelay(500);
+		mdelay(1000);
 		dm_gpio_set_value(&priv->backlight_gpio, true);
 		
 
