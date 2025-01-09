@@ -125,7 +125,7 @@
 	struct otm8009a_panel_priv {
 		struct udevice *reg;
 		struct gpio_desc enable;
-                struct gpio_desc backlightenable;
+        struct gpio_desc backlight_gpio;
 		struct udevice *backlight;
 		struct udevice *pwm;
 	};
@@ -267,7 +267,7 @@
 		}
 		
 		mdelay(500);
-		dm_gpio_set_value(&priv->backlightenable, true);
+		dm_gpio_set_value(&priv->backlight_gpio, true);
 		
 
 		return 0;
@@ -297,7 +297,7 @@
 			}
 		}
 
-		ret = gpio_request_by_name(dev, "backligh-gpios", 0, &priv->backlightenable,
+		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_gpio,
 					   GPIOD_IS_OUT_ACTIVE);
 		
 		ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
