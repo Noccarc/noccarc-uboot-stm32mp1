@@ -341,7 +341,7 @@
 		mdelay(10); /* >50us */
 		dm_gpio_set_value(&priv->enable, true);
 		mdelay(10); /* >5ms */
-		dm_gpio_set_value(&priv->backlight_gpio, false;
+		dm_gpio_set_value(&priv->backlight_gpio, false);
 
 
 		/* fill characteristics of DSI data link */
