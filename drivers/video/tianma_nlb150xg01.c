@@ -125,7 +125,7 @@
 	struct otm8009a_panel_priv {
 		struct udevice *reg;
 		struct gpio_desc enable;
-        struct gpio_desc backlight_gpio;
+        // struct gpio_desc backlight_gpio;
 		struct udevice *backlight;
 		struct udevice *pwm;
 	};
@@ -259,15 +259,15 @@
 		if (ret)
 			return ret;
 		
-		mdelay(10);
+		mdelay(200);
 		ret = backlight_enable(priv->backlight);
 		if (ret){
 			log_info("driver: set enable failed \n");
 			return ret;
 		}
 		
-		mdelay(100);
-		dm_gpio_set_value(&priv->backlight_gpio, true);
+		// mdelay(100);
+		// dm_gpio_set_value(&priv->backlight_gpio, true);
 		
 
 		return 0;
@@ -297,11 +297,11 @@
 			}
 		}
 
-		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_gpio,
-					   GPIOD_IS_OUT_ACTIVE);
-		if(ret){
-			printf("driver ret value: %d\n", ret);
-		}
+		// ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_gpio,
+		// 			   GPIOD_IS_OUT_ACTIVE);
+		// if(ret){
+		// 	printf("driver ret value: %d\n", ret);
+		// }
 		
 
 		
@@ -346,7 +346,7 @@
 		mdelay(10); /* >50us */
 		dm_gpio_set_value(&priv->enable, true);
 		mdelay(10); /* >5ms */
-		dm_gpio_set_value(&priv->backlight_gpio, true);
+		// dm_gpio_set_value(&priv->backlight_gpio, true);
 
 
 		/* fill characteristics of DSI data link */
