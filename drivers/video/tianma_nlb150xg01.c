@@ -299,6 +299,11 @@
 
 		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_gpio,
 					   GPIOD_IS_OUT_ACTIVE);
+		if(ret){
+			printf("driver ret value: %d\n", ret);
+		}
+		
+
 		
 		ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
 					   GPIOD_IS_OUT_ACTIVE);
