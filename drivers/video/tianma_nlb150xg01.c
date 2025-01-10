@@ -259,7 +259,7 @@
 		if (ret)
 			return ret;
 		
-		mdelay(200);
+		mdelay(500);
 		ret = backlight_enable(priv->backlight);
 		if (ret){
 			log_info("driver: set enable failed \n");
