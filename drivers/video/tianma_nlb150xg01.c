@@ -125,7 +125,8 @@
 	struct otm8009a_panel_priv {
 		struct udevice *reg;
 		struct gpio_desc enable;
-        // struct gpio_desc backlight_gpio;
+        struct gpio_desc backlight_en;
+		struct gpio_desc backlight_pwm;
 		struct udevice *backlight;
 		struct udevice *pwm;
 	};
@@ -260,11 +261,15 @@
 			return ret;
 		
 		mdelay(200);
-		ret = backlight_enable(priv->backlight);
-		if (ret){
-			log_info("driver: set enable failed \n");
-			return ret;
-		}
+
+		dm_gpio_set_value(&priv->backlight_en, true);
+
+		dm_gpio_set_value(&priv->backlight_pwm, true);
+		// ret = backlight_enable(priv->backlight);
+		// if (ret){
+		// 	log_info("driver: set enable failed \n");
+		// 	return ret;
+		// }
 		
 		// mdelay(100);
 		// dm_gpio_set_value(&priv->backlight_gpio, true);
@@ -297,14 +302,6 @@
 			}
 		}
 
-		// ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_gpio,
-		// 			   GPIOD_IS_OUT_ACTIVE);
-		// if(ret){
-		// 	printf("driver ret value: %d\n", ret);
-		// }
-		
-
-		
 		ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
 					   GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
@@ -313,13 +310,31 @@
 			if (ret != -ENOENT)
 				return ret;	
 		}
-		
-		ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
-						   "backlight", &priv->backlight);
+
+		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
+					   GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
-			log_info("%s: Cannot get backlight: ret=%d\n", __func__, ret);
-			return ret;
+			dev_err(dev, "warning: cannot get backlight-enable GPIO\n");
+			log_info("driver: backlight-enable gpio not found\n");
+			if (ret != -ENOENT)
+				return ret;	
 		}
+
+		ret = gpio_request_by_name(dev, "backlight-pwm", 0, &priv->backlight_pwm,
+					   GPIOD_IS_OUT_ACTIVE);
+		if (ret) {
+			dev_err(dev, "warning: cannot get backlight-pwm GPIO\n");
+			log_info("driver: backlight-pwm gpio not found\n");
+			if (ret != -ENOENT)
+				return ret;	
+		}
+		
+		// ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
+		// 				   "backlight", &priv->backlight);
+		// if (ret) {
+		// 	log_info("%s: Cannot get backlight: ret=%d\n", __func__, ret);
+		// 	return ret;
+		// }
 		
 
 
@@ -347,6 +362,10 @@
 		dm_gpio_set_value(&priv->enable, true);
 		mdelay(10); /* >5ms */
 		// dm_gpio_set_value(&priv->backlight_gpio, true);
+
+		dm_gpio_set_value(&priv->backlight_en, true);
+
+		dm_gpio_set_value(&priv->backlight_pwm, true);
 
 
 		/* fill characteristics of DSI data link */
