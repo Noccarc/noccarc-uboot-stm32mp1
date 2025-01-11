@@ -262,14 +262,14 @@
 		
 		mdelay(200);
 
-		dm_gpio_set_value(&priv->backlight_en, true);
+		// dm_gpio_set_value(&priv->backlight_en, true);
 
-		dm_gpio_set_value(&priv->backlight_pwm, true);
-		// ret = backlight_enable(priv->backlight);
-		// if (ret){
-		// 	log_info("driver: set enable failed \n");
-		// 	return ret;
-		// }
+		// dm_gpio_set_value(&priv->backlight_pwm, true);
+		ret = backlight_enable(priv->backlight);
+		if (ret){
+			log_info("driver: set enable failed \n");
+			return ret;
+		}
 		
 		// mdelay(100);
 		// dm_gpio_set_value(&priv->backlight_gpio, true);
@@ -311,23 +311,23 @@
 				return ret;	
 		}
 
-		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
-					   GPIOD_IS_OUT_ACTIVE);
-		if (ret) {
-			dev_err(dev, "warning: cannot get backlight-enable GPIO\n");
-			log_info("driver: backlight-enable gpio not found\n");
-			if (ret != -ENOENT)
-				return ret;	
-		}
+		// ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
+		// 			   GPIOD_IS_OUT_ACTIVE);
+		// if (ret) {
+		// 	dev_err(dev, "warning: cannot get backlight-enable GPIO\n");
+		// 	log_info("driver: backlight-enable gpio not found\n");
+		// 	if (ret != -ENOENT)
+		// 		return ret;	
+		// }
 
-		ret = gpio_request_by_name(dev, "backlight-pwm", 0, &priv->backlight_pwm,
-					   GPIOD_IS_OUT_ACTIVE);
-		if (ret) {
-			dev_err(dev, "warning: cannot get backlight-pwm GPIO\n");
-			log_info("driver: backlight-pwm gpio not found\n");
-			if (ret != -ENOENT)
-				return ret;	
-		}
+		// ret = gpio_request_by_name(dev, "backlight-pwm", 0, &priv->backlight_pwm,
+		// 			   GPIOD_IS_OUT_ACTIVE);
+		// if (ret) {
+		// 	dev_err(dev, "warning: cannot get backlight-pwm GPIO\n");
+		// 	log_info("driver: backlight-pwm gpio not found\n");
+		// 	if (ret != -ENOENT)
+		// 		return ret;	
+		// }
 		
 		// ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
 		// 				   "backlight", &priv->backlight);
@@ -363,9 +363,9 @@
 		mdelay(10); /* >5ms */
 		// dm_gpio_set_value(&priv->backlight_gpio, true);
 
-		dm_gpio_set_value(&priv->backlight_en, true);
+		// dm_gpio_set_value(&priv->backlight_en, true);
 
-		dm_gpio_set_value(&priv->backlight_pwm, true);
+		// dm_gpio_set_value(&priv->backlight_pwm, true);
 
 
 		/* fill characteristics of DSI data link */
