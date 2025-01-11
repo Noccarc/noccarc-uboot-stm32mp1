@@ -267,6 +267,7 @@
 		// dm_gpio_set_value(&priv->backlight_pwm, true);
 		ret = backlight_enable(dev);
 		
+		log_info("driver: Entered enable backlight :%d\n",ret);
 		/*if (ret){
 			log_info("driver: set enable failed \n");
 			return ret;
