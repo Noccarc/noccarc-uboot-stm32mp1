@@ -247,7 +247,7 @@
 	{
 		struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 		struct mipi_dsi_device *device = plat->device;
-		//struct otm8009a_panel_priv *priv = dev_get_priv(dev);
+		struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 		int ret = 0;
 		
 		log_info("driver: Entered enable backlight \n");
@@ -265,7 +265,7 @@
 		// dm_gpio_set_value(&priv->backlight_en, true);
 
 		// dm_gpio_set_value(&priv->backlight_pwm, true);
-		ret = backlight_enable(dev);
+		ret = backlight_enable(priv->backlight);
 		
 		log_info("driver: Entered enable backlight :%d\n",ret);
 		/*if (ret){
