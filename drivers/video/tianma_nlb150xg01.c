@@ -266,10 +266,11 @@
 
 		// dm_gpio_set_value(&priv->backlight_pwm, true);
 		ret = backlight_enable(dev);
-		if (ret){
+		
+		/*if (ret){
 			log_info("driver: set enable failed \n");
 			return ret;
-		}
+		}*/
 		
 		// mdelay(100);
 		// dm_gpio_set_value(&priv->backlight_gpio, true);
