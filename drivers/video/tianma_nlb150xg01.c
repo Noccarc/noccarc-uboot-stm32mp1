@@ -313,7 +313,7 @@
 				return ret;	
 		}
 
-		ret = gpio_request_by_name(dev, "backlight-enable", 1, &priv->backlight_en,
+		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
 					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
 			dev_err(dev, "warning: cannot get backlight-enable GPIO= %d\n",ret);
@@ -322,7 +322,7 @@
 				return ret;	
 		}
 
-		ret = gpio_request_by_name(dev, "backlight-pwm", 2, &priv->backlight_pwm,
+		ret = gpio_request_by_name(dev, "backlight-pwm", 0, &priv->backlight_pwm,
 					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
 			dev_err(dev, "warning: cannot get backlight-pwm GPIO = %d\n ",ret);
