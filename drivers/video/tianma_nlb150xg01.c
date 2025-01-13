@@ -23,6 +23,45 @@
 	#include <command.h>
 	#include <pwm.h>
 
+	#include <common.h>
+#include <adc.h>
+#include <bootm.h>
+#include <clk.h>
+#include <config.h>
+#include <dm.h>
+#include <env.h>
+#include <env_internal.h>
+#include <fdt_support.h>
+#include <g_dnl.h>
+#include <generic-phy.h>
+#include <hang.h>
+#include <i2c.h>
+#include <init.h>
+#include <led.h>
+#include <log.h>
+#include <malloc.h>
+#include <misc.h>
+#include <mtd_node.h>
+#include <net.h>
+#include <netdev.h>
+#include <phy.h>
+#include <remoteproc.h>
+#include <reset.h>
+#include <syscon.h>
+#include <usb.h>
+#include <watchdog.h>
+#include <asm/io.h>
+#include <asm/gpio.h>
+#include <asm/arch/stm32.h>
+#include <asm/arch/sys_proto.h>
+#include <jffs2/load_kernel.h>
+#include <linux/bitops.h>
+#include <linux/delay.h>
+#include <linux/err.h>
+#include <linux/iopoll.h>
+#include <power/regulator.h>
+#include <usb/dwc2_udc.h>
+
 
 	#define OTM8009A_BACKLIGHT_DEFAULT	100
 	#define OTM8009A_BACKLIGHT_MAX		255
