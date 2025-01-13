@@ -342,7 +342,7 @@
 					       &priv->backlight_en, GPIOD_IS_OUT)) {
 			debug("%s: could not find a /config/backlight_en\n",
 			      __func__);
-				  log_info("driver: enable gpio not found\n");
+				  log_info("driver: enable backlight-gpio not found\n");
 		} 
 		if (gpio_request_by_name_nodev(node, "lvds-gpios", 0,
 					       &priv->enable, GPIOD_IS_OUT)) {
