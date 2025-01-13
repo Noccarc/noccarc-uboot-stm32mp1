@@ -314,7 +314,7 @@
 		}
 
 		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
-					   GPIOD_IS_OUT_ACTIVE);
+					   GPIOD_IS_OUT);
 		if (ret) {
 			dev_err(dev, "warning: cannot get backlight-enable GPIO= %d\n",ret);
 			log_info("driver: backlight-enable gpio not found = %d \n ",ret);
@@ -323,7 +323,7 @@
 		}
 
 		ret = gpio_request_by_name(dev, "backlight-pwm", 0, &priv->backlight_pwm,
-					   GPIOD_IS_OUT_ACTIVE);
+					   GPIOD_IS_OUT);
 		if (ret) {
 			dev_err(dev, "warning: cannot get backlight-pwm GPIO = %d\n ",ret);
 			log_info("driver: backlight-pwm gpio not found=%d\n",ret);
