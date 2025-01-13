@@ -261,7 +261,7 @@
 			return ret;
 		
 		mdelay(200);
-		dm_gpio_set_value(&priv->enable, true);
+		//dm_gpio_set_value(&priv->enable, true);
 		// dm_gpio_set_value(&priv->backlight_en, true);
 
 		// dm_gpio_set_value(&priv->backlight_pwm, true);
@@ -292,6 +292,31 @@
 	{
 		struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 		int ret;
+		ofnode node;
+	
+		node = ofnode_path("/config");
+		if (!ofnode_valid(node)) {
+			debug("%s: no /config node?\n", __func__);
+			return;
+		}
+		if (gpio_request_by_name_nodev(node, "backlight-gpios", 0,
+					       &priv->backlight_en, GPIOD_IS_OUT)) {
+			debug("%s: could not find a /config/backlight_en\n",
+			      __func__);
+		} 
+		if (gpio_request_by_name_nodev(node, "lvds-gpios", 0,
+					       &priv->enable, GPIOD_IS_OUT)) {
+			debug("%s: could not find a /config/vds-gpios\n",
+			      __func__);
+		} 
+		if (gpio_request_by_name_nodev(node, "pwm-gpios", 0,
+					       &priv->backlight_pwm, GPIOD_IS_OUT)) {
+			debug("%s: could not find a /config/pwm-gpios\n",
+			      __func__);
+		} 
+		dm_gpio_set_value(&priv->enable, true);
+		dm_gpio_set_value(&priv->backlight_pwm, true);
+		dm_gpio_set_value(&priv->backlight_en, true);
 
 		log_info("driver: Entered of to plat \n");
 		
@@ -304,14 +329,14 @@
 			}
 		}
 
-		ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
-					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
-		if (ret) {
-			dev_err(dev, "warning: cannot get enable GPIO\n");
-			log_info("driver: enable gpio not found\n");
-			if (ret != -ENOENT)
-				return ret;	
-		}
+		// ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
+		// 			   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+		// if (ret) {
+		// 	dev_err(dev, "warning: cannot get enable GPIO\n");
+		// 	log_info("driver: enable gpio not found\n");
+		// 	if (ret != -ENOENT)
+		// 		return ret;	
+		// }
 
 		/*ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
 					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
