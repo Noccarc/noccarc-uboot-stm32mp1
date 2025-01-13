@@ -303,16 +303,19 @@
 					       &priv->backlight_en, GPIOD_IS_OUT)) {
 			debug("%s: could not find a /config/backlight_en\n",
 			      __func__);
+				  log_info("driver: enable gpio not found\n");
 		} 
 		if (gpio_request_by_name_nodev(node, "lvds-gpios", 0,
 					       &priv->enable, GPIOD_IS_OUT)) {
 			debug("%s: could not find a /config/vds-gpios\n",
 			      __func__);
+				  log_info("driver: enable gpio not found\n");
 		} 
 		if (gpio_request_by_name_nodev(node, "pwm-gpios", 0,
 					       &priv->backlight_pwm, GPIOD_IS_OUT)) {
 			debug("%s: could not find a /config/pwm-gpios\n",
 			      __func__);
+				  log_info("driver: enable gpio not found\n");
 		} 
 		dm_gpio_set_value(&priv->enable, true);
 		dm_gpio_set_value(&priv->backlight_pwm, true);
