@@ -261,10 +261,10 @@
 			return ret;
 		
 		mdelay(200);
+		dm_gpio_set_value(&priv->enable, true);
+		// dm_gpio_set_value(&priv->backlight_en, true);
 
-		 dm_gpio_set_value(&priv->backlight_en, true);
-
-		 dm_gpio_set_value(&priv->backlight_pwm, true);
+		// dm_gpio_set_value(&priv->backlight_pwm, true);
 		//ret = backlight_enable(priv->backlight);
 		
 		//log_info("driver: Entered enable backlight :%d\n",ret);
@@ -313,7 +313,7 @@
 				return ret;	
 		}
 
-		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
+		/*ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
 					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
 			dev_err(dev, "warning: cannot get backlight-enable GPIO= %d\n",ret);
@@ -329,7 +329,7 @@
 			log_info("driver: backlight-pwm gpio not found=%d\n",ret);
 			if (ret != -ENOENT)
 				return ret;	
-		}
+		}*/
 		
 		// ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
 		// 				   "backlight", &priv->backlight);
@@ -359,10 +359,10 @@
 		}	
 
 		/* enable panel */
-		dm_gpio_set_value(&priv->enable, false);
-		mdelay(10); /* >50us */
-		dm_gpio_set_value(&priv->enable, true);
-		mdelay(10); /* >5ms */
+		//dm_gpio_set_value(&priv->enable, false);
+		//mdelay(10); /* >50us */
+		//dm_gpio_set_value(&priv->enable, true);
+		//mdelay(10); /* >5ms */
 		// dm_gpio_set_value(&priv->backlight_gpio, true);
 
 		// dm_gpio_set_value(&priv->backlight_en, true);
