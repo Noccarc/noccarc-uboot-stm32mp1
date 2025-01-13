@@ -305,7 +305,7 @@
 		}
 
 		ret = gpio_request_by_name(dev, "enable-gpios", 0, &priv->enable,
-					   GPIOD_IS_OUT_ACTIVE);
+					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
 			dev_err(dev, "warning: cannot get enable GPIO\n");
 			log_info("driver: enable gpio not found\n");
@@ -314,7 +314,7 @@
 		}
 
 		ret = gpio_request_by_name(dev, "backlight-enable", 0, &priv->backlight_en,
-					   GPIOD_IS_OUT);
+					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
 			dev_err(dev, "warning: cannot get backlight-enable GPIO= %d\n",ret);
 			log_info("driver: backlight-enable gpio not found = %d \n ",ret);
@@ -323,7 +323,7 @@
 		}
 
 		ret = gpio_request_by_name(dev, "backlight-pwm", 0, &priv->backlight_pwm,
-					   GPIOD_IS_OUT);
+					   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
 		if (ret) {
 			dev_err(dev, "warning: cannot get backlight-pwm GPIO = %d\n ",ret);
 			log_info("driver: backlight-pwm gpio not found=%d\n",ret);
@@ -331,12 +331,12 @@
 				return ret;	
 		}
 		
-		ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
-						   "backlight", &priv->backlight);
-		if (ret) {
-			log_info("%s: Cannot get backlight: ret=%d\n", __func__, ret);
-			return ret;
-		}
+		// ret = uclass_get_device_by_phandle(UCLASS_PANEL_BACKLIGHT, dev,
+		// 				   "backlight", &priv->backlight);
+		// if (ret) {
+		// 	log_info("%s: Cannot get backlight: ret=%d\n", __func__, ret);
+		// 	return ret;
+		// }
 		
 
 
