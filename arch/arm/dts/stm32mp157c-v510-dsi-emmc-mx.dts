@@ -98,6 +98,12 @@
 		mmc1    = &sdmmc2;
 	};
 
+	config {
+		backlight-gpios = <&gpioe 15 GPIO_ACTIVE_HIGH>; // Backlight enable GPIO
+		lvds-gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;      // SN65DSI83 enable GPIO
+		pwm-gpios = <&gpiof 8 GPIO_ACTIVE_HIGH>;        // Optional: GPIO controlling PWM pin
+	};
+
     led{
 		compatible = "gpio-leds";
 
@@ -170,13 +176,23 @@
 		stdout-path = "serial0:115200n8";
 	};
 	
-	backlight:panel-backlight { 
-		compatible = "gpio-backlight";
+	// backlight:panel-backlight { 
+	// 	compatible = "gpio-backlight";
+	// 	power-supply = <&vdd>;
+	// 	gpios = <&gpioe 15 GPIO_ACTIVE_HIGH>;
+	// 	status = "okay";
+	// };
+
+	
+	backlight: panel-backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm13 0 500000>; // Channel 0, 2kHz
 		power-supply = <&vdd>;
-		gpios = <&gpioe 15 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&gpioe 15 GPIO_ACTIVE_HIGH>; // Backlight control
+		brightness-levels = <0 127>;
+		default-brightness-level = <100>;
 		status = "okay";
 	};
-
 	
 	usb_phy_tuning:usb-phy-tuning{
 		st,hs-dc-level = <2>;
@@ -387,22 +403,34 @@
 	/* USER CODE END pinctrl_z */
 };
 
-&timers13{
-	status = "okay";
+// &timers13{
+// 	status = "okay";
 
-	/* USER CODE BEGIN timers13 */
-	/* USER CODE END timers13 */
+// 	/* USER CODE BEGIN timers13 */
+// 	/* USER CODE END timers13 */
 
-	pwm13:pwm{
-		pinctrl-names = "default", "sleep";
-		pinctrl-0 = <&tim13_pwm_pins_mx>;
-		pinctrl-1 = <&tim13_pwm_sleep_pins_mx>;
-		status = "okay";
+// 	pwm13:pwm{
+// 		pinctrl-names = "default", "sleep";
+// 		pinctrl-0 = <&tim13_pwm_pins_mx>;
+// 		pinctrl-1 = <&tim13_pwm_sleep_pins_mx>;
+// 		status = "okay";
 
-		/* USER CODE BEGIN timers13_pwm */
-		#pwm-cells = <2>;
-		/* USER CODE END timers13_pwm */
-	};
+// 		/* USER CODE BEGIN timers13_pwm */
+// 		#pwm-cells = <2>;
+// 		/* USER CODE END timers13_pwm */
+// 	};
+// };
+
+&timers13 {
+    status = "okay";
+
+    pwm13: pwm {
+        pinctrl-names = "default", "sleep";
+        pinctrl-0 = <&tim13_pwm_pins_mx>;
+        pinctrl-1 = <&tim13_pwm_sleep_pins_mx>;
+        status = "okay";
+        #pwm-cells = <2>; // <channel polarity> (e.g., <0 0> for channel 0, active high)
+    };
 };
 
 &bsec{
@@ -487,7 +515,7 @@
 		enable-gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;
 		power-supply = <&vdd>;
 		backlight = <&backlight>;
-		//pwms = <&pwm13>;
+		pwms = <&pwm13 0 500000>; // PWM for brightness (PF8, TIM13_CH1)
 		status = "okay";
 		port {
 			panel_in: endpoint {

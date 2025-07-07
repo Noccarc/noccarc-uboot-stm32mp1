@@ -327,7 +327,7 @@
 		return 0;
 	}
 
-	static int otm8009a_panel_ofdata_to_platdata(struct udevice *dev)
+	static int otm8009a_panel_ofdata_to_platdata(struct udevicotm8009a_panel_ofdata_to_platdatae *dev)
 	{
 		struct otm8009a_panel_priv *priv = dev_get_priv(dev);
 		int ret;
