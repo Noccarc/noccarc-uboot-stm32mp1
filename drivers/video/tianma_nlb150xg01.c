@@ -221,14 +221,14 @@
 		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
 			
 		
-		hback_porch      = 160     //default_timing->hback_porch.typ;
-		hsync_len        = 136     //default_timing->hsync_len.typ;
-		vback_porch      = 29      //default_timing->vback_porch.typ;
-		vsync_len        =  6      //default_timing->vsync_len.typ;
-		hfront_porch     =  24     //default_timing->hfront_porch.typ;	
-		hactive          =  1024   //default_timing->hactive.typ;
-		vfront_porch     =  3      //default_timing->vfront_porch.typ;
-		vactive          =  768    //default_timing->vactive.typ;
+		hback_porch      = 160;     //default_timing->hback_porch.typ;
+		hsync_len        = 136;     //default_timing->hsync_len.typ;
+		vback_porch      = 29;      //default_timing->vback_porch.typ;
+		vsync_len        =  6 ;     //default_timing->vsync_len.typ;
+		hfront_porch     =  24 ;    //default_timing->hfront_porch.typ;	
+		hactive          =  1024 ;  //default_timing->hactive.typ;
+		vfront_porch     =  3   ;   //default_timing->vfront_porch.typ;
+		vactive          =  768 ;   //default_timing->vactive.typ;
 
 		
 		dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20		
