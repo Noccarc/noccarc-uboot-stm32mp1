@@ -520,6 +520,8 @@ static int otm8009a_panel_probe(struct udevice *dev)
 	int ret;
 	
 	log_info("driver: Entered probe \n");
+	log_info("[panel] ofdata_to_platdata entered\n");
+	printf("[panel] ofdata_to_platdata entered\n");
 	
 	if (IS_ENABLED(CONFIG_DM_REGULATOR) && priv->reg) {
 		dev_dbg(dev, "enable regulator '%s'\n", priv->reg->name);
@@ -557,6 +559,9 @@ static const struct udevice_id otm8009a_panel_ids[] = {
 	{ .compatible = "tianma,nlb150xg01" },
 	{ }
 };
+
+
+
 
 U_BOOT_DRIVER(otm8009a_panel) = {
 	.name			  = "otm8009a_panel",
