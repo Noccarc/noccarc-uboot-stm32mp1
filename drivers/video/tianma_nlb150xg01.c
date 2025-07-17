@@ -282,15 +282,15 @@
 		return 0;
 	}
 
-	static int otm8009a_panel_enable_backlight(struct udevice *dev)
+		static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	{
 		struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 		struct mipi_dsi_device *device = plat->device;
 		struct otm8009a_panel_priv *priv = dev_get_priv(dev);
-		int ret = 0;
-		
-		log_info("driver: Entered enable backlight \n");
-		
+		int ret;
+
+		log_info("driver: Entered enable backlight\n");
+
 		ret = mipi_dsi_attach(device);
 		if (ret < 0)
 			return ret;
@@ -298,23 +298,12 @@
 		ret = otm8009a_init_sequence(dev);
 		if (ret)
 			return ret;
-		
-		// mdelay(200);
-		// dm_gpio_set_value(&priv->enable, true);
-		// dm_gpio_set_value(&priv->backlight_en, true);
 
-		// dm_gpio_set_value(&priv->backlight_pwm, true);
-		// ret = backlight_enable(priv->backlight);
-		
-		// log_info("driver: Entered enable backlight :%d\n",ret);
-		// if (ret){
-		// 	log_info("driver: set enable failed \n");
-		// 	return ret;
-		// }
-		
-		// mdelay(100);
-		// dm_gpio_set_value(&priv->backlight_gpio, true);
-		
+		mdelay(200); // Wait after bridge setup
+
+		dm_gpio_set_value(&priv->backlight_en, true);
+		mdelay(10);
+		dm_gpio_set_value(&priv->backlight_pwm, true);
 
 		return 0;
 	}
