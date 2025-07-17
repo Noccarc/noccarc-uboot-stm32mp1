@@ -299,10 +299,9 @@
 		if (ret)
 			return ret;
 
-		mdelay(10); // Wait after bridge setup
+		mdelay(100); // Wait after bridge setup
 
 		dm_gpio_set_value(&priv->backlight_en, true);
-		mdelay(5);
 		dm_gpio_set_value(&priv->backlight_pwm, true);
 
 		return 0;
