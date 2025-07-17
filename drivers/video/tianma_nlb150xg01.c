@@ -282,7 +282,7 @@
 		return 0;
 	}
 
-		static int otm8009a_panel_enable_backlight(struct udevice *dev)
+	static int otm8009a_panel_enable_backlight(struct udevice *dev)
 	{
 		struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 		struct mipi_dsi_device *device = plat->device;
@@ -299,7 +299,7 @@
 		if (ret)
 			return ret;
 
-		mdelay(50); // Wait after bridge setup
+		mdelay(300); // Wait after bridge setup
 
 		dm_gpio_set_value(&priv->backlight_en, true);
 		mdelay(10);
