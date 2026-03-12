@@ -183,6 +183,21 @@
 	};
 
 
+	static void sn65dsi83_dump_registers(struct udevice *dev1)
+	{
+		u8 val;
+		int i;
+
+		printf("\nSN65DSI83 Register Dump:\n");
+
+		for (i = 0x00; i <= 0x3C; i++) {
+			val = dm_i2c_reg_read(dev1, i);
+			printf("Reg[0x%02X] = 0x%02X\n", i, val);
+		}
+
+		printf("---- End Dump ----\n");
+	}
+
 	static int otm8009a_init_sequence(struct udevice *dev)
 	{
 		struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
@@ -219,7 +234,7 @@
 		
 
 		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
-		
+
 		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
 		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x0);     //1a	
 		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
@@ -278,10 +293,12 @@
 		dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
 		mdelay(10);
 		
+		sn65dsi83_dump_registers(dev1);
 		/* Clear all errors that got asserted during initialization. */
 		val=0;
 		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
 		dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+		
 		
 		return 0;
 	}
