@@ -188,6 +188,12 @@
 	{
 		struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 		struct mipi_dsi_device *device = plat->device;
+		/* Reset SN65DSI83 */
+		dm_gpio_set_value(&priv->enable, 0);
+		mdelay(10);
+		dm_gpio_set_value(&priv->enable, 1);
+		mdelay(10);
+
 		uchar ret;
 		struct udevice *dev1;
 		int ret1;
@@ -204,6 +210,8 @@
 				   3);
 			return ret1;
 		}
+
+		
 		
 		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);   //0d
 		mdelay(1);
@@ -222,7 +230,7 @@
 		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
 
 		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
-		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x0);     //1a	
+		dm_i2c_reg_write(dev1, REG_LVDS_LANE, REG_LVDS_LANE_CHA_LVDS_TERM);     //1a	
 		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
 			
 		
@@ -255,20 +263,19 @@
 		dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);                 //3c
 		
 		/* Enable PLL */
+		mdelay(10);
 		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
 		
-		for(i=0; i<10; i++)
-		{
+		for (i = 0; i < 10; i++) {
 			mdelay(1);
-			val=0;
 			val = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
-			if(val & 0x80 == 0x80)
-			{
+
+			if ((val & 0x80) == 0x80) {
 				pll_en_flag = true;
 				break;
 			}
 		}
-		
+				
 		if (pll_en_flag==false) {
 			log_info("tianma: (attach) failed to lock PLL \n");
 			/* On failure, disable PLL again and exit. */
