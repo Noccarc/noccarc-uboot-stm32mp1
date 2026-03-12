@@ -183,153 +183,107 @@
 	};
 
 
-	static void sn65dsi83_dump_registers(struct udevice *dev1)
-	{
-		u8 val;
-		int i;
-
-		printf("\nSN65DSI83 Register Dump:\n");
-
-		for (i = 0x00; i <= 0x3C; i++) {
-			val = dm_i2c_reg_read(dev1, i);
-			printf("Reg[0x%02X] = 0x%02X\n", i, val);
-		}
-
-		printf("---- End Dump ----\n");
-	}
-
-	// 
 	
 	static int otm8009a_init_sequence(struct udevice *dev)
 	{
 		struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
 		struct mipi_dsi_device *device = plat->device;
+		uchar ret;
 		struct udevice *dev1;
 		int ret1;
-		u8 val = 0;
+		
+		u8 val=0,i=0,k=0;
 		bool pll_en_flag = false;
-		int i;
+		u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
+		u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
 
-		u32 hback_porch = 160;
-		u32 hsync_len   = 136;
-		u32 vback_porch = 29;
-		u32 vsync_len   = 6;
-		u32 hfront_porch = 24;
-		u32 hactive = 1024;
-		u32 vfront_porch = 3;
-		u32 vactive = 768;
-
-		ret1 = i2c_get_chip_for_busnum(3, 0x2c, 1, &dev1);
+		ret1 = i2c_get_chip_for_busnum(3, 0x2c,
+						  1, &dev1);
 		if (ret1) {
-			log_info("Cannot find SN65DSI83 on bus\n");
+			log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
+				   3);
 			return ret1;
 		}
-
-		/* ------------------------------------------------ */
-		/* 1. Reset bridge first (important) */
-		/* ------------------------------------------------ */
-
-		dm_i2c_reg_write(dev1, REG_RC_RESET, REG_RC_RESET_SOFT_RESET);
-		mdelay(10);
-
-		/* ------------------------------------------------ */
-		/* 2. Disable PLL before configuration */
-		/* ------------------------------------------------ */
-
-		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
+		
+		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);   //0d
 		mdelay(1);
+		/* Reference clock derived from DSI link clock. */
+		dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);  //0a
+		dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x50);      //12
+		dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x28);   //0b
+		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);    //0d
+		/* Set number of DSI lanes and LVDS link config. */
+		dm_i2c_reg_write(dev1, REG_DSI_LANE, 0x30);     //10
+		/* No equalization. */
+		dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);       //11
 
-		/* ------------------------------------------------ */
-		/* 3. Configure PLL and DSI clock */
-		/* ------------------------------------------------ */
+		
 
-		dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);
-		dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x50);
-		dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x28);
+		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
 
-		/* ------------------------------------------------ */
-		/* 4. Configure DSI lanes */
-		/* ------------------------------------------------ */
+		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
+		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x0);     //1a	
+		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
+			
+		
+		hback_porch      = 160;     //default_timing->hback_porch.typ;
+		hsync_len        = 136;     //default_timing->hsync_len.typ;
+		vback_porch      = 29;      //default_timing->vback_porch.typ;
+		vsync_len        =  6 ;     //default_timing->vsync_len.typ;
+		hfront_porch     =  24 ;    //default_timing->hfront_porch.typ;	
+		hactive          =  1024 ;  //default_timing->hactive.typ;
+		vfront_porch     =  3   ;   //default_timing->vfront_porch.typ;
+		vactive          =  768 ;   //default_timing->vactive.typ;
 
-		dm_i2c_reg_write(dev1, REG_DSI_LANE, 0x30);
-		dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);
-
-		/* ------------------------------------------------ */
-		/* 5. Configure LVDS output */
-		/* ------------------------------------------------ */
-
-		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);   /* 24-bit LVDS JEIDA */
-		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);
-		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);
-		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);
-
-		/* ------------------------------------------------ */
-		/* 6. Configure video timing */
-		/* ------------------------------------------------ */
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive & 0xff));
-		dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive >> 8) & 0xff));
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, (u8)(vactive & 0xff));
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, (u8)((vactive >> 8) & 0xff));
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_LOW, 0xff);
-		dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_HIGH, 0x00);
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, (u8)(hsync_len & 0xff));
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, (u8)((hsync_len >> 8) & 0xff));
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, (u8)(vsync_len & 0xff));
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, (u8)((vsync_len >> 8) & 0xff));
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_BACK_PORCH, (u8)(hback_porch & 0xff));
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_BACK_PORCH, (u8)(vback_porch & 0xff));
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_FRONT_PORCH, (u8)(hfront_porch & 0xff));
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_FRONT_PORCH, (u8)(vfront_porch & 0xff));
-
-		dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);
-
-		/* ------------------------------------------------ */
-		/* 7. Enable PLL */
-		/* ------------------------------------------------ */
-
-		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, REG_RC_PLL_EN_PLL_EN);
-
-		for (i = 0; i < 10; i++) {
+		
+		dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20		
+		dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive>>8)&0xff));      //21	
+		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, (u8)(vactive&0xff));         //24
+		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, (u8)((vactive>>8)&0xff));   //25
+		/* 32 + 1 pixel clock to ensure proper operation */
+		dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_LOW, 0xff);               //28
+		dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_HIGH, 0x00);              //29
+		dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, (u8)(hsync_len&0xff));             //2c
+		dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, (u8)((hsync_len>>8)&0xff));       //2d
+		dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, (u8)(vsync_len&0xff));             //30
+			
+		dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, (u8)((vsync_len>>8)&0xff));       //31
+		dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_BACK_PORCH, (u8)(hback_porch&0xff));           //34
+		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_BACK_PORCH, (u8)(vback_porch&0xff));             //36
+		dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_FRONT_PORCH, (u8)(hfront_porch&0xff));         //38
+		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_FRONT_PORCH, (u8)(vfront_porch&0xff));           //3a
+		dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);                 //3c
+		
+		/* Enable PLL */
+		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
+		
+		for(i=0; i<10; i++)
+		{
 			mdelay(1);
-
+			val=0;
 			val = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
-
-			if ((val & REG_RC_LVDS_PLL_PLL_EN_STAT) ==
-				REG_RC_LVDS_PLL_PLL_EN_STAT) {
+			if(val & 0x80 == 0x80)
+			{
 				pll_en_flag = true;
 				break;
 			}
 		}
-
-		if (!pll_en_flag) {
-			log_info("SN65DSI83: PLL lock failed\n");
+		
+		if (pll_en_flag==false) {
+			log_info("tianma: (attach) failed to lock PLL \n");
+			/* On failure, disable PLL again and exit. */
 			dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
 			return -EINVAL;
 		}
-
-		/* ------------------------------------------------ */
-		/* 8. Soft reset after configuration */
-		/* ------------------------------------------------ */
-
-		dm_i2c_reg_write(dev1, REG_RC_RESET, REG_RC_RESET_SOFT_RESET);
+		/* Trigger reset after CSR register update. */
+		dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
 		mdelay(10);
-
-		/* Clear IRQ flags */
-
+		
+		/* Clear all errors that got asserted during initialization. */
+		val=0;
 		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
 		dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
-
-		/* Debug dump */
-
-		sn65dsi83_dump_registers(dev1);
-
+		
 		return 0;
 	}
 
