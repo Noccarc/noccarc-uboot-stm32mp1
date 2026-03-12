@@ -208,7 +208,7 @@
 		mdelay(1);
 		/* Reference clock derived from DSI link clock. */
 		dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);  //0a
-		dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x48);      //12
+		dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x50);      //12
 		dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x28);   //0b
 		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);    //0d
 		/* Set number of DSI lanes and LVDS link config. */
@@ -220,7 +220,7 @@
 
 		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
 		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
-		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x02);     //1a	
+		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x0);     //1a	
 		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
 			
 		
