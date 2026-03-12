@@ -183,114 +183,199 @@
 	};
 
 
+	// static int otm8009a_init_sequence(struct udevice *dev)
+	// {
+	// 	struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
+	// 	struct mipi_dsi_device *device = plat->device;
+	// 	uchar ret;
+	// 	struct udevice *dev1;
+	// 	int ret1;
+		
+	// 	u8 val=0,i=0,k=0;
+	// 	bool pll_en_flag = false;
+	// 	u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
+	// 	u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
+
+	// 	ret1 = i2c_get_chip_for_busnum(3, 0x2c,
+	// 					  1, &dev1);
+	// 	if (ret1) {
+	// 		log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
+	// 			   3);
+	// 		return ret1;
+	// 	}
+
 	
+		
+	// 	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);   //0d
+	// 	mdelay(1);
+	// 	/* Reference clock derived from DSI link clock. */
+	// 	dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);  //0a
+	// 	dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x50);      //12
+	// 	dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x28);   //0b
+	// 	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);    //0d
+	// 	/* Set number of DSI lanes and LVDS link config. */
+	// 	dm_i2c_reg_write(dev1, REG_DSI_LANE, 0x30);     //10
+	// 	/* No equalization. */
+	// 	dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);       //11
+
+		
+
+	// 	dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
+	// 	dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
+	// 	dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x0);     //1a	
+	// 	dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
+			
+		
+	// 	hback_porch      = 160;     //default_timing->hback_porch.typ;
+	// 	hsync_len        = 136;     //default_timing->hsync_len.typ;
+	// 	vback_porch      = 29;      //default_timing->vback_porch.typ;
+	// 	vsync_len        =  6 ;     //default_timing->vsync_len.typ;
+	// 	hfront_porch     =  24 ;    //default_timing->hfront_porch.typ;	
+	// 	hactive          =  1024 ;  //default_timing->hactive.typ;
+	// 	vfront_porch     =  3   ;   //default_timing->vfront_porch.typ;
+	// 	vactive          =  768 ;   //default_timing->vactive.typ;
+
+		
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20		
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive>>8)&0xff));      //21	
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, (u8)(vactive&0xff));         //24
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, (u8)((vactive>>8)&0xff));   //25
+	// 	/* 32 + 1 pixel clock to ensure proper operation */
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_LOW, 0xff);               //28
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_HIGH, 0x00);              //29
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, (u8)(hsync_len&0xff));             //2c
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, (u8)((hsync_len>>8)&0xff));       //2d
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, (u8)(vsync_len&0xff));             //30
+			
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, (u8)((vsync_len>>8)&0xff));       //31
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_BACK_PORCH, (u8)(hback_porch&0xff));           //34
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_BACK_PORCH, (u8)(vback_porch&0xff));             //36
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_FRONT_PORCH, (u8)(hfront_porch&0xff));         //38
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_FRONT_PORCH, (u8)(vfront_porch&0xff));           //3a
+	// 	dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);                 //3c
+		
+	// 	/* Enable PLL */
+	// 	delay(10)
+	// 	dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
+		
+	// 	for(i=0; i<10; i++)
+	// 	{
+	// 		mdelay(1);
+	// 		val=0;
+	// 		val = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
+	// 		if((val & 0x80) == 0x80)
+	// 		{
+	// 			pll_en_flag = true;
+	// 			break;
+	// 		}
+	// 	}
+		
+	// 	if (pll_en_flag==false) {
+	// 		log_info("tianma: (attach) failed to lock PLL \n");
+	// 		/* On failure, disable PLL again and exit. */
+	// 		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
+	// 		return -EINVAL;
+	// 	}
+	// 	/* Trigger reset after CSR register update. */
+	// 	dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
+	// 	mdelay(10);
+		
+	// 	/* Clear all errors that got asserted during initialization. */
+	// 	val=0;
+	// 	val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
+	// 	dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+		
+	// 	return 0;
+	// }
+
 	static int otm8009a_init_sequence(struct udevice *dev)
 	{
-		struct mipi_dsi_panel_plat *plat = dev_get_platdata(dev);
-		struct mipi_dsi_device *device = plat->device;
-		/* Reset SN65DSI83 */
-		dm_gpio_set_value(&priv->enable, 0);
-		mdelay(10);
-		dm_gpio_set_value(&priv->enable, 1);
-		mdelay(10);
+		struct otm8009a_panel_priv *priv = dev_get_priv(dev);
+		struct udevice *bridge;
+		u8 val;
+		int i, ret;
 
-		uchar ret;
-		struct udevice *dev1;
-		int ret1;
-		
-		u8 val=0,i=0,k=0;
-		bool pll_en_flag = false;
-		u32 hback_porch, hsync_len, hfront_porch, hactive, htime1, htime2;
-		u32 vback_porch, vsync_len, vfront_porch, vactive, vtime1, vtime2;
-
-		ret1 = i2c_get_chip_for_busnum(3, 0x2c,
-						  1, &dev1);
-		if (ret1) {
-			log_info("driver %s: Cannot find udev for a bus %d\n", __func__,
-				   3);
-			return ret1;
+		ret = i2c_get_chip_for_busnum(3, 0x2c, 1, &bridge);
+		if (ret) {
+			printf("SN65DSI83 not found\n");
+			return ret;
 		}
 
-		
-		
-		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);   //0d
-		mdelay(1);
-		/* Reference clock derived from DSI link clock. */
-		dm_i2c_reg_write(dev1, REG_RC_LVDS_PLL, 0x05);  //0a
-		dm_i2c_reg_write(dev1, REG_DSI_CLK, 0x50);      //12
-		dm_i2c_reg_write(dev1, REG_RC_DSI_CLK, 0x28);   //0b
-		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);    //0d
-		/* Set number of DSI lanes and LVDS link config. */
-		dm_i2c_reg_write(dev1, REG_DSI_LANE, 0x30);     //10
-		/* No equalization. */
-		dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);       //11
+		printf("SN65DSI83 init...\n");
 
-		
+		/* Reset bridge */
+		dm_gpio_set_value(&priv->enable, 0);
+		mdelay(20);
+		dm_gpio_set_value(&priv->enable, 1);
+		mdelay(20);
 
-		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
+		/* Disable PLL */
+		dm_i2c_reg_write(bridge, 0x0D, 0x00);
+		mdelay(2);
 
-		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
-		dm_i2c_reg_write(dev1, REG_LVDS_LANE, REG_LVDS_LANE_CHA_LVDS_TERM);     //1a	
-		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
-			
-		
-		hback_porch      = 160;     //default_timing->hback_porch.typ;
-		hsync_len        = 136;     //default_timing->hsync_len.typ;
-		vback_porch      = 29;      //default_timing->vback_porch.typ;
-		vsync_len        =  6 ;     //default_timing->vsync_len.typ;
-		hfront_porch     =  24 ;    //default_timing->hfront_porch.typ;	
-		hactive          =  1024 ;  //default_timing->hactive.typ;
-		vfront_porch     =  3   ;   //default_timing->vfront_porch.typ;
-		vactive          =  768 ;   //default_timing->vactive.typ;
+		/* PLL configuration */
+		dm_i2c_reg_write(bridge, 0x0A, 0x05);
+		dm_i2c_reg_write(bridge, 0x12, 0x50);
+		dm_i2c_reg_write(bridge, 0x0B, 0x28);
 
-		
-		dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, (u8)(hactive&0xff));            //20		
-		dm_i2c_reg_write(dev1, REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, (u8)((hactive>>8)&0xff));      //21	
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, (u8)(vactive&0xff));         //24
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, (u8)((vactive>>8)&0xff));   //25
-		/* 32 + 1 pixel clock to ensure proper operation */
-		dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_LOW, 0xff);               //28
-		dm_i2c_reg_write(dev1, REG_VID_CHA_SYNC_DELAY_HIGH, 0x00);              //29
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, (u8)(hsync_len&0xff));             //2c
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, (u8)((hsync_len>>8)&0xff));       //2d
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, (u8)(vsync_len&0xff));             //30
-			
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, (u8)((vsync_len>>8)&0xff));       //31
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_BACK_PORCH, (u8)(hback_porch&0xff));           //34
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_BACK_PORCH, (u8)(vback_porch&0xff));             //36
-		dm_i2c_reg_write(dev1, REG_VID_CHA_HORIZONTAL_FRONT_PORCH, (u8)(hfront_porch&0xff));         //38
-		dm_i2c_reg_write(dev1, REG_VID_CHA_VERTICAL_FRONT_PORCH, (u8)(vfront_porch&0xff));           //3a
-		dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);                 //3c
-		
-		/* Enable PLL */
+		/* DSI configuration */
+		dm_i2c_reg_write(bridge, 0x10, 0x30);
+		dm_i2c_reg_write(bridge, 0x11, 0x00);
+
+		/* LVDS configuration */
+		dm_i2c_reg_write(bridge, 0x18, 0x78);
+		dm_i2c_reg_write(bridge, 0x19, 0x00);
+		dm_i2c_reg_write(bridge, 0x1A, 0x02);
+		dm_i2c_reg_write(bridge, 0x1B, 0x00);
+
+		/* Video timing */
+		dm_i2c_reg_write(bridge, 0x20, 0x00);
+		dm_i2c_reg_write(bridge, 0x21, 0x04);
+
+		dm_i2c_reg_write(bridge, 0x24, 0x00);
+		dm_i2c_reg_write(bridge, 0x25, 0x03);
+
+		dm_i2c_reg_write(bridge, 0x28, 0xFF);
+		dm_i2c_reg_write(bridge, 0x29, 0x00);
+
+		dm_i2c_reg_write(bridge, 0x2C, 0x88);
+		dm_i2c_reg_write(bridge, 0x2D, 0x00);
+
+		dm_i2c_reg_write(bridge, 0x30, 0x06);
+		dm_i2c_reg_write(bridge, 0x31, 0x00);
+
+		dm_i2c_reg_write(bridge, 0x34, 0xA0);
+		dm_i2c_reg_write(bridge, 0x36, 0x1D);
+
+		dm_i2c_reg_write(bridge, 0x38, 0x18);
+		dm_i2c_reg_write(bridge, 0x3A, 0x03);
+
+		dm_i2c_reg_write(bridge, 0x3C, 0x00);
+
 		mdelay(10);
-		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
-		
-		for (i = 0; i < 10; i++) {
-			mdelay(1);
-			val = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
+
+		/* Enable PLL */
+		dm_i2c_reg_write(bridge, 0x0D, 0x01);
+
+		/* Wait for PLL lock */
+		for (i = 0; i < 20; i++) {
+			mdelay(2);
+			val = dm_i2c_reg_read(bridge, 0x0A);
 
 			if ((val & 0x80) == 0x80) {
-				pll_en_flag = true;
+				printf("SN65DSI83 PLL LOCKED\n");
 				break;
 			}
 		}
-				
-		if (pll_en_flag==false) {
-			log_info("tianma: (attach) failed to lock PLL \n");
-			/* On failure, disable PLL again and exit. */
-			dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
-			return -EINVAL;
+
+		if ((val & 0x80) == 0) {
+			printf("SN65DSI83 PLL FAILED\n");
+			return -1;
 		}
-		/* Trigger reset after CSR register update. */
-		dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
-		mdelay(10);
-		
-		/* Clear all errors that got asserted during initialization. */
-		val=0;
-		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
-		dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
-		
+
+		/* Start LVDS output */
+		dm_i2c_reg_write(bridge, 0x09, 0x01);
+
 		return 0;
 	}
 
