@@ -216,38 +216,12 @@
 		/* No equalization. */
 		dm_i2c_reg_write(dev1, REG_DSI_EQ, 0x00);       //11
 
-		/* Configure LVDS format dynamically */
-		val = 0;
+		
 
-		/* Enable 24-bit LVDS */
-		val |= REG_LVDS_FMT_CHA_24BPP_MODE;
-
-		/* JEIDA format */
-		val |= REG_LVDS_FMT_CHA_24BPP_FORMAT1;
-
-		/* Most LVDS panels require negative sync */
-		val |= REG_LVDS_FMT_HS_NEG_POLARITY;
-		val |= REG_LVDS_FMT_VS_NEG_POLARITY;
-
-		/* Single-link LVDS */
-		val |= REG_LVDS_FMT_LVDS_LINK_CFG;
-
-		printf("U-Boot: LVDS_FMT = 0x%02x\n", val);
-
-		dm_i2c_reg_write(dev1, REG_LVDS_FMT, val);
-
-		/* LVDS electrical settings */
-		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);
-
-		/* Enable LVDS termination */
-		dm_i2c_reg_write(dev1, REG_LVDS_LANE, REG_LVDS_LANE_CHA_LVDS_TERM);
-
-		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);
-
-		// dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x7A);       //18
-		// dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
-		// dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a	
-		// dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
+		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
+		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
+		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a	
+		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
 			
 		
 		hback_porch      = 160;     //default_timing->hback_porch.typ;
