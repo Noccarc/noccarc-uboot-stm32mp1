@@ -278,7 +278,7 @@
 		/* Trigger reset after CSR register update. */
 		dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
 		mdelay(10);
-		
+		log_info("tianma: %d (attach) failed to lock PLL \n",dm_i2c_reg_read(dev1, REG_LVDS_FMT));
 		/* Clear all errors that got asserted during initialization. */
 		val=0;
 		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
