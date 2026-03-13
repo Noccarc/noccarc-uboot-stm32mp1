@@ -274,18 +274,15 @@
 			return -EINVAL;
 		}
 
-		/* Enable test pattern */
-		dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x01);
-
-		// /* Trigger reset after CSR register update. */
+		
+		/* Trigger reset after CSR register update. */
 		dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
+		mdelay(10);
 		
-		// mdelay(10);
-		
-		// /* Clear all errors that got asserted during initialization. */
-		// val=0;
-		// val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
-		// dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+		/* Clear all errors that got asserted during initialization. */
+		val=0;
+		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
+		dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
 		
 		return 0;
 	}
