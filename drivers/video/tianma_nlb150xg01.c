@@ -218,7 +218,7 @@
 
 		
 
-		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x70);       //18
+		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
 		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
 		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a	
 		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
@@ -283,6 +283,10 @@
 		val=0;
 		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
 		dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+		while (1);
+		{
+			/* code */
+		}
 		
 		return 0;
 	}
