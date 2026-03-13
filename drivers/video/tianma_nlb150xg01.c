@@ -219,7 +219,7 @@
 		
 
 		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
-		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x02);     //19
+		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
 		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x0);     //1a	
 		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
 			
@@ -253,7 +253,6 @@
 		dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x00);                 //3c
 		
 		/* Enable PLL */
-		mdelay(10);
 		dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x01);    
 		
 		for(i=0; i<10; i++)
@@ -261,7 +260,8 @@
 			mdelay(1);
 			val=0;
 			val = dm_i2c_reg_read(dev1, REG_RC_LVDS_PLL);
-			if ((val & 0x80) == 0x80) {
+			if(val & 0x80 == 0x80)
+			{
 				pll_en_flag = true;
 				break;
 			}
@@ -273,14 +273,22 @@
 			dm_i2c_reg_write(dev1, REG_RC_PLL_EN, 0x00);
 			return -EINVAL;
 		}
-		/* Trigger reset after CSR register update. */
-		dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
-		mdelay(10);
+
+		/* Enable test pattern */
+		dm_i2c_reg_write(bridge, 0x3C, 0x01);
+
+		/* Start output */
+		dm_i2c_reg_write(bridge, 0x09, 0x01);
+
+		log_info("Test pattern enabled\n");
+		// /* Trigger reset after CSR register update. */
+		// dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
+		// mdelay(10);
 		
-		/* Clear all errors that got asserted during initialization. */
-		val=0;
-		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
-		dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+		// /* Clear all errors that got asserted during initialization. */
+		// val=0;
+		// val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
+		// dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
 		
 		return 0;
 	}
