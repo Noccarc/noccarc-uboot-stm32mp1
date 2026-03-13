@@ -218,7 +218,7 @@
 
 		
 
-		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x78);       //18
+		dm_i2c_reg_write(dev1, REG_LVDS_FMT, 0x70);       //18
 		dm_i2c_reg_write(dev1, REG_LVDS_VCOM, 0x00);     //19
 		dm_i2c_reg_write(dev1, REG_LVDS_LANE, 0x00);     //1a	
 		dm_i2c_reg_write(dev1, REG_LVDS_CM, 0x00);       //1b
