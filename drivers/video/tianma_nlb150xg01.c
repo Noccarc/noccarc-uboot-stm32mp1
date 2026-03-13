@@ -283,6 +283,8 @@
 		val=0;
 		val = dm_i2c_reg_read(dev1, REG_IRQ_STAT);
 		dm_i2c_reg_write(dev1, REG_IRQ_STAT, val);
+
+		dm_i2c_reg_write(dev1, 0x3c, 0x10);
 		
 		return 0;
 	}
