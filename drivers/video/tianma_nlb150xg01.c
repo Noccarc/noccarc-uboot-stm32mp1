@@ -275,14 +275,11 @@
 		}
 
 		/* Enable test pattern */
-		dm_i2c_reg_write(bridge, 0x3C, 0x01);
+		dm_i2c_reg_write(dev1, REG_VID_CHA_TEST_PATTERN, 0x01);
 
-		/* Start output */
-		dm_i2c_reg_write(bridge, 0x09, 0x01);
-
-		log_info("Test pattern enabled\n");
 		// /* Trigger reset after CSR register update. */
-		// dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
+		dm_i2c_reg_write(dev1, REG_RC_RESET, 0x01);
+		
 		// mdelay(10);
 		
 		// /* Clear all errors that got asserted during initialization. */
